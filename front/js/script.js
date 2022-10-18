@@ -16,7 +16,7 @@ fetch(`http://localhost:3000/api/products` /*, requestInit*/ )
         // on convertit le json en objet javascript
     })
     .catch((error) => {
-        alert(error.message);
+        alert("Le serveur met du temps à répondre...");
     });
 
 

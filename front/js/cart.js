@@ -1,2 +1,1 @@
-// page panier
-// Quand on clique sur le bouton,
+//retenir également que sur la page panier on récupère directement une chaîne de caractère qu on reconvertit en objet JS() avec la méthode json.parse
