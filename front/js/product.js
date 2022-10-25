@@ -1,5 +1,6 @@
-// récupérer l'id du produit ayant été cliqué sur la page produit dans l'url
+//localStorage.clear();
 
+// récupérer l'id du produit ayant été cliqué sur la page produit dans l'url
 let searchParams = new URLSearchParams(window.location.search);
 const kanapId = searchParams.get("_id");
 
@@ -11,42 +12,37 @@ const kanapName = document.getElementById('title');
 const kanapPrice = document.getElementById('price');
 const kanapDescription = document.querySelector('#description');
 const kanapColors = document.querySelector("#colors");
-
 const kanapQuantity = document.getElementById('quantity');
 
+let quantityChosen = 0;
+let colorChosen = '';
+
 const button = document.getElementById('addToCart');
-let cart = [];
+// let cart = [];
 
 // créer un array contenant les 3 paramètres du produit
 
-/*let Product = {
-    kanapId,
-    colorChosen: '',
-    quantityChosen: '0',
-};*/
-
-class Product {
-    constructor(kanapId, currentQuantity, currentColor) {
-        this.kanapId = kanapId;
-        this.currentQuantity = currentQuantity;
-        this.currentColor = currentColor;
-    }
+let produit = {
+    kanapId: '',
+    kanapQuantity: 0,
+    kanapColors: ''
 }
 
 // on utilise fetch pour récupérer les détails du produit en question
 
-// on s'assure que l'id obtenu est bien le bon
+// on s'assure que l'id obtenu est bien le bon (avec un if ! cf. notes)
 console.log(kanapId);
 if (kanapId !== null) {
     fetch(`http://localhost:3000/api/products/${kanapId}`)
         .then((result) => result.json())
         .then((result) => {
-            console.log(result);
+            //console.log(result);
             kanapDetails(result);
         })
         .catch((error) => {
             alert("Le serveur met du temps à répondre...");
         });
+
 
     //on insère les données recueillies dans la page HTML et on ajoute chaque élément dans la page
     function kanapDetails(result) {
@@ -61,88 +57,76 @@ if (kanapId !== null) {
 
     // Ajouter des produits dans le panier (localStorage pour l'instant)
 
-    // Récupérer la couleur et la quantité choisies quand elles changent : (faire en sorte qu'on ne prenne la quantité qu'au bout de qq seconde sinon on n'a pas le temps d'écrire une valeur que déjà l'alerte apparaît) ?
+    // Récupérer la couleur et la quantité choisies quand elles changent 
 
     kanapColors.addEventListener("change", function(e) {
-        let colorChosen = e.target.value;
-        currentColor = colorChosen;
+        colorChosen = e.target.value;
+        console.log(colorChosen);
     });
 
     kanapQuantity.addEventListener("input", function(e) {
-        let quantityChosen = e.target.value;
-        currentQuantity = quantityChosen;
+        quantityChosen = e.target.value;
+        console.log(quantityChosen);
     });
-
-    /*function qty() {
-        kanapQuantity.addEventListener("input", function(e) {
-            let quantityChosen = e.target.value;
-            if (quantityChosen !== '') {
-                currentQuantity = quantityChosen;
-            } else {
-                currentQuantity = '';
-            }
-        })
-    }*/
-
-    /*function watchQuantity(currentQuantity) {
-        if (currentQuantity > 100 || currentQuantity < 1) {
-            alert('Veuillez choisir une quantité entre 1 et 100');
-            return false;
-        } else {
-            alert(quantityChosen + ' Kanaps dans votre panier');
-            return true;
-        }
-    }*/
-
-    function watchColor(currentColor) {
-        if (currentColor === '') {
-            alert('Veuillez choisir une couleur');
-            return false;
-        } else {
-            alert('Vous avez choisi ' + colorChosen);
-            return true;
-        }
-    }
-
-
 
     // au clic sur le bouton, on met l'article correspondant (id/quantité/couleur du produit) dans un "tableau" dans le local storage"
 
-
-
     button.addEventListener('click', addToCart, false /* pour les tâches spécifiques on peut mettre à true qui nécessite d'annuler le premier clic */ );
-    // vérifier auparavant si le local storage ne contiendrait pas déjà un panier)
-    // écrire 2 fonctions JStoString et StringToJS ou manipuler directement json.parse et json.stringify
-    // une fois qu'on a créé un objet JS il faudra faire une boucle pour parcourir le panier
-    // il existe des boucles auto pour parcourir les objets (forEach)
+
     function addToCart() {
         // on met une condition pour que l'article soit ajouté au panier : il doit avoir une couleur et une quantité valable
-        if (!watchColor) {
+        if (colorChosen === '') {
             window.confirm("Vous n'avez pas choisi de couleur")
             return;
-        } else if (currentQuantity < 1 && currentQuantity > 100) {
+        } else if ((quantityChosen > 100 || quantityChosen < 1)) {
             window.confirm('Veuillez choisir une quantité entre 1 et 100');
             return;
         } else {
-            alert('ok');
-            // 1. créer un nouveau produit (classe Product)
-            let product = new Product(kanapId, currentQuantity, currentColor);
-            window.confirm('le produit');
-            // 2. ajouter ce produit au panier (qui est un tableau nommé "panier")
-            cart.push(product);
-            window.confirm(cart);
-            // 3. stocker le panier dans le local storage
-            let cartJson = JSON.stringify(cart);
-            console.log(cartJson);
-            let ls = localStorage.setItem("cart", cartJson);
-            console.log(ls);
+            // on déclare les variables qui seront utilisées dans la fonction
+            let panier = []; // ou : let panier = new Array();
+            let isNewProduct = true; //oui on peut enregistrer ce produit car il est nouveau
+
+            //lire d'abord le panier déjà stocké et vérifier s'il existe (vérifier auparavant si le local storage ne contiendrait pas déjà un panier)
+            console.log(localStorage.getItem("panier"));
+
+            panier = localStorage.getItem("panier") === null ? [] : JSON.parse(localStorage.getItem("panier"))
+            console.log(panier);
+            // 1. créer un nouveau produit 
+            //avec for each on pourrait créer une foncton appelée à chaque tour (voir devdocs)
+            produit.kanapId = kanapId;
+            produit.kanapQuantity = parseInt(quantityChosen);
+            produit.kanapColors = colorChosen;
+            console.log(produit['kanapQuantity']);
+            if (panier.length > 0) {
+                let compteur = 0;
+                for (produitStock of panier) {
+                    if (produitStock.kanapId === produit.kanapId) {
+                        console.log('déjà dans le panier');
+                        if (produitStock.kanapColors === produit.kanapColors) {
+                            console.log('déjà dans le panier et même couleur');
+                            panier[compteur]['kanapQuantity'] += produit.kanapQuantity;
+                            console.log('on augmente la quantité de :' + panier[compteur]['kanapQuantity']);
+                            isNewProduct = false;
+                            break;
+                        } else {
+                            isNewProduct = false;
+                            console.log('ajout du produit ')
+                                // on définit cette variable pour signaler qu'on ne pourra plus enregistrer ce produit
+                        }
+                    }
+                    compteur++;
+                }
+                if (isNewProduct) {
+                    panier.push(produitStock);
+                    console.log('ajout du produit ')
+                }
+            } else {
+                panier.push(produit); //on ajoute le tout premier produit dans le panier
+                console.log('ajout du produit')
+            }
+            localStorage.setItem("panier", JSON.stringify(panier));
+            console.log(localStorage.getItem("panier"));
         }
-
-
-        //localStorage.setItem(product, [])
-
-        //on peut stocker le tableau en json(area to string) json.stringify
-        //utiliser ces méthodes pour pouvoir le faire
 
         /*
         product.kanapId = kanapId;

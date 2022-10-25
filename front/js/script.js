@@ -7,12 +7,10 @@ let itemsContainer = document.querySelector(".items");
 fetch(`http://localhost:3000/api/products` /*, requestInit*/ )
     .then(function(result) {
         // le premier result est du json pur
-        console.log(result);
         return result.json();
     })
     .then((result2) => {
         showKanaps(result2);
-        console.log(result2);
         // on convertit le json en objet javascript
     })
     .catch((error) => {
@@ -21,6 +19,8 @@ fetch(`http://localhost:3000/api/products` /*, requestInit*/ )
 
 
 //On crée de nouvelles balises HTML pour y ajouter toutes les données recueillies
+//utiliser create element plutôt (cf cours)
+// let lien = document.createElement ...
 function showKanaps(result) {
     let content = "";
     // on fait une boucle for pour parcourir et récupérer tous les éléments
