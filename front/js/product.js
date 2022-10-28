@@ -18,9 +18,8 @@ let quantityChosen = 0;
 let colorChosen = '';
 
 const button = document.getElementById('addToCart');
-// let cart = [];
 
-// créer un array contenant les 3 paramètres du produit
+// créer un objet contenant les 3 paramètres du produit
 
 let produit = {
     kanapId: '',
@@ -96,42 +95,46 @@ if (kanapId !== null) {
             produit.kanapId = kanapId;
             produit.kanapQuantity = parseInt(quantityChosen);
             produit.kanapColors = colorChosen;
+
+            console.log(produit['kanapId']);
             console.log(produit['kanapQuantity']);
+            console.log(produit['kanapColors']);
+
             if (panier.length > 0) {
                 let compteur = 0;
+                /**  on fait une boucle for of pour regarder chaque article du panier pour s'assurer que
+                 l'article choisi n'y est pas déjà, auquel cas on ajoute juste la quantité */
                 for (produitStock of panier) {
+
                     if (produitStock.kanapId === produit.kanapId) {
-                        console.log('déjà dans le panier');
+                        console.log('ce type de canapé est déjà dans le panier donc on vérifie la couleur');
                         if (produitStock.kanapColors === produit.kanapColors) {
-                            console.log('déjà dans le panier et même couleur');
+                            console.log('déjà dans le panier et même couleur donc on ajoute juste la quantité');
                             panier[compteur]['kanapQuantity'] += produit.kanapQuantity;
-                            console.log('on augmente la quantité de :' + panier[compteur]['kanapQuantity']);
+                            console.log('la quantité passe à : ' + panier[compteur]['kanapQuantity']);
                             isNewProduct = false;
                             break;
                         } else {
-                            isNewProduct = false;
-                            console.log('ajout du produit ')
-                                // on définit cette variable pour signaler qu'on ne pourra plus enregistrer ce produit
+                            isNewProduct = true;
+                            // on définit cette variable pour signaler qu'on ne pourra plus enregistrer ce produit
+                            /** c'est le même produit mais d'une couleur différente donc on l'ajoute */
+                            console.log('ajout du produit avec même id mais couleur différente')
                         }
                     }
+                    //isNewProduct = true;
                     compteur++;
                 }
                 if (isNewProduct) {
-                    panier.push(produitStock);
-                    console.log('ajout du produit ')
+                    panier.push(produit);
+                    console.log('ajout du produit');
                 }
             } else {
                 panier.push(produit); //on ajoute le tout premier produit dans le panier
-                console.log('ajout du produit')
+                console.log('ajout du premier produit')
             }
+
             localStorage.setItem("panier", JSON.stringify(panier));
             console.log(localStorage.getItem("panier"));
         }
-
-        /*
-        product.kanapId = kanapId;
-        product.colorChosen = currentColor;
-        product.quantityChosen = currentQuantity;
-        */
     }
 }
