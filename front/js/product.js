@@ -5,14 +5,13 @@ let searchParams = new URLSearchParams(window.location.search);
 const kanapId = searchParams.get("_id");
 
 // Déclaration des variables qui seront utilisées pour insérer les données dans la page HTML
-// let itemsContainer = document.querySelector(".item"); à garder ?
-
 const kanapImgDetails = document.querySelector('.item__img');
-const kanapName = document.getElementById('title');
-const kanapPrice = document.getElementById('price');
+const kanapName = document.querySelector('#title');
+const kanaptPrice = document.querySelector('#price');
 const kanapDescription = document.querySelector('#description');
+
 const kanapColors = document.querySelector("#colors");
-const kanapQuantity = document.getElementById('quantity');
+const kanapQuantity = document.querySelector('#quantity');
 
 let quantityChosen = 0;
 let colorChosen = '';
@@ -24,7 +23,7 @@ const button = document.getElementById('addToCart');
 let produit = {
     kanapId: '',
     kanapQuantity: 0,
-    kanapColors: ''
+    kanapColor: ''
 }
 
 // on utilise fetch pour récupérer les détails du produit en question
@@ -45,13 +44,20 @@ if (kanapId !== null) {
 
     //on insère les données recueillies dans la page HTML et on ajoute chaque élément dans la page
     function kanapDetails(result) {
-        kanapImgDetails.innerHTML = `<img src="${result.imageUrl}" alt="${result.altTxt}">`;
-        kanapName.innerHTML = `<h1 id="title"> ${result.name} </h1>`;
-        kanapPrice.innerHTML = `<span id="price"> ${result.price} </span>`;
-        kanapDescription.innerHTML = `<p id="description"> ${result.description} </p>`;
+        // on créé une balise img dans laquelle insérer l'image et le texte correspondant
+        let kanapImg = document.createElement('img');
+        kanapImgDetails.appendChild(kanapImg);
+        kanapImg.setAttribute('src', `${result.imageUrl}`);
+        kanapImg.setAttribute('alt', `${result.altTxt}`);
+        kanapName.innerHTML = `${result.name}`;
+        kanaptPrice.innerHTML = `${result.price}`;
+        kanapDescription.innerHTML = `${result.description}`;
+
         for (let i = 0; i < result.colors.length; i++) {
-            kanapColors.innerHTML += `<option value="${result.colors[i]}">${result.colors[i]}</option>`
+            kanapColors.innerHTML += `
+            <option value="${result.colors[i]}">${result.colors[i]}</option>`
         }
+
     }
 
     // Ajouter des produits dans le panier (localStorage pour l'instant)
@@ -94,11 +100,11 @@ if (kanapId !== null) {
             //avec for each on pourrait créer une foncton appelée à chaque tour (voir devdocs)
             produit.kanapId = kanapId;
             produit.kanapQuantity = parseInt(quantityChosen);
-            produit.kanapColors = colorChosen;
+            produit.kanapColor = colorChosen;
 
             console.log(produit['kanapId']);
             console.log(produit['kanapQuantity']);
-            console.log(produit['kanapColors']);
+            console.log(produit['kanapColor']);
 
             if (panier.length > 0) {
                 let compteur = 0;
@@ -108,7 +114,7 @@ if (kanapId !== null) {
 
                     if (produitStock.kanapId === produit.kanapId) {
                         console.log('ce type de canapé est déjà dans le panier donc on vérifie la couleur');
-                        if (produitStock.kanapColors === produit.kanapColors) {
+                        if (produitStock.kanapColor === produit.kanapColor) {
                             console.log('déjà dans le panier et même couleur donc on ajoute juste la quantité');
                             panier[compteur]['kanapQuantity'] += produit.kanapQuantity;
                             console.log('la quantité passe à : ' + panier[compteur]['kanapQuantity']);
