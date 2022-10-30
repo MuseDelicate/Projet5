@@ -1,16 +1,21 @@
-let itemsContainer = document.querySelector(".items");
 //let requestInit = new Request();
 //requestInit.headers.append("MimeType", "application/json");
 
+
+
 // Requête de l'API pour récupérer les données
+// savoir expliquer le principe de fetch, avec promise, async, await et callback, et requestInit
 // connaître les différentes syntaxes (avec le mot clé function ou les fléches ou l'absence d'acolade sans utiliser de return). L'acolade signiafie qu'il y a un "bloc" de choses à réaliser)
-fetch(`http://localhost:3000/api/products` /*, requestInit*/ )
-    .then(function(result) {
+fetch(`http://localhost:3000/api/products`)
+    .then(function(res) {
         // le premier result est du json pur
-        return result.json();
+        if (res.ok) {
+            return res.json();
+        }
     })
-    .then((result2) => {
-        showKanaps(result2);
+    .then((result) => {
+        console.log(result);
+        showKanaps(result);
         // on convertit le json en objet javascript
     })
     .catch((error) => {
@@ -18,22 +23,34 @@ fetch(`http://localhost:3000/api/products` /*, requestInit*/ )
     });
 
 
-//On crée de nouvelles balises HTML pour y ajouter toutes les données recueillies
-//utiliser create element plutôt (cf cours)
 // let lien = document.createElement ...
 function showKanaps(result) {
-    let content = "";
     // on fait une boucle for pour parcourir et récupérer tous les éléments
+    let content = "";
     for (let i = 0; i < result.length; i++) {
         // on ajoute chaque élément dans la page
-        content += `
-    <a href="./product.html?_id=${result[i]._id}"> 
-      <article>
-        <img src="${result[i].imageUrl}" alt="${result[i].altTxt}">
-        <h3 class="productName">${result[i].name}</h3> 
-        <p class="productDescription">${result[i].description}</p>
-      </article>
-    </a>`;
+
+        //On crée de nouvelles balises HTML pour y ajouter toutes les données recueillies
+
+        let kanapLink = document.createElement('a');
+        let itemsArticle = document.createElement('article');
+        let kanapImg = document.createElement('img');
+        let kanapName = document.createElement('h3');
+        let kanapDescription = document.createElement('p');
+
+        let itemsContainer = document.querySelector("#items");
+        itemsContainer.appendChild(kanapLink);
+        kanapLink.appendChild(itemsArticle);
+        itemsArticle.appendChild(kanapImg);
+        kanapName.className = 'productName';
+        itemsArticle.appendChild(kanapName);
+        kanapDescription.className = 'productDescription';
+        itemsArticle.appendChild(kanapDescription);
+
+        kanapLink.setAttribute('href', `./product.html?_id=${result[i]._id}`)
+        kanapImg.setAttribute('src', `${result[i].imageUrl}`);
+        kanapImg.setAttribute('alt', `${result[i].altTxt}`);
+        kanapName.innerHTML = `${result[i].name}`;
+        kanapDescription.innerHTML = `${result[i].description}`;
     }
-    itemsContainer.innerHTML = content;
 }
