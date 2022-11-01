@@ -6,12 +6,15 @@ console.log(cart);
 const kanapHtmlContainer = document.querySelector('#cart__items');
 
 // pas de boucle for dans fetch
+// on utilise async et await car fetch peut prendre du temps
 async function getDetails(kanapId) {
-    return result = await fetch(`http://localhost:3000/api/products/${kanapId}`);
+    result = await fetch(`http://localhost:3000/api/products/${kanapId}`);
+    return result;
 }
 
 function parcourirPanierKanaps(cart) {
     for (let item of cart) {
+        console.log(item.kanapColor);
         getDetails(item.kanapId)
             .then((response) => response.json())
             .then((details) => {
@@ -26,7 +29,7 @@ function showCartKanap(produit, details) {
     let kanapHtmlData = document.createElement('article');
     kanapHtmlData.classList.add('cart__item');
     kanapHtmlData.setAttribute('data-ID', produit.kanapId)
-    kanapHtmlData.setAttribute('data-color', produit.kanapColors);
+    kanapHtmlData.setAttribute('data-color', produit.kanapColor);
 
     //création conteneur image
     let kanapCartImg = document.createElement('div');
@@ -49,7 +52,7 @@ function showCartKanap(produit, details) {
     kanapTitle.textContent = details.name;
 
     let kanapColor = document.createElement('p');
-    kanapColor.innerHTML = produit.kanapColors;
+    kanapColor.innerHTML = produit.kanapColor;
 
     let kanapPrice = document.createElement('p');
     kanapPrice.innerHTML = details.price + '€';
