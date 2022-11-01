@@ -46,7 +46,6 @@ if (kanapId !== null) {
     function kanapDetails(result) {
         // on créé une balise img dans laquelle insérer l'image et le texte correspondant
         let kanapImg = document.createElement('img');
-        kanapImgDetails.appendChild(kanapImg);
         kanapImg.setAttribute('src', `${result.imageUrl}`);
         kanapImg.setAttribute('alt', `${result.altTxt}`);
         kanapName.innerHTML = `${result.name}`;
@@ -57,7 +56,9 @@ if (kanapId !== null) {
             kanapColors.innerHTML += `
             <option value="${result.colors[i]}">${result.colors[i]}</option>`
         }
+        kanapImgDetails.appendChild(kanapImg);
 
+        // créer les elts, initialiser, les composer (appendChild) puis les ajouter sur la page
     }
 
     // Ajouter des produits dans le panier (localStorage pour l'instant)

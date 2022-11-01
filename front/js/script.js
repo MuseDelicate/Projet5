@@ -26,7 +26,6 @@ fetch(`http://localhost:3000/api/products`)
 // let lien = document.createElement ...
 function showKanaps(result) {
     // on fait une boucle for pour parcourir et récupérer tous les éléments
-    let content = "";
     for (let i = 0; i < result.length; i++) {
         // on ajoute chaque élément dans la page
 
@@ -37,20 +36,25 @@ function showKanaps(result) {
         let kanapImg = document.createElement('img');
         let kanapName = document.createElement('h3');
         let kanapDescription = document.createElement('p');
-
-        let itemsContainer = document.querySelector("#items");
-        itemsContainer.appendChild(kanapLink);
-        kanapLink.appendChild(itemsArticle);
-        itemsArticle.appendChild(kanapImg);
-        kanapName.className = 'productName';
-        itemsArticle.appendChild(kanapName);
-        kanapDescription.className = 'productDescription';
-        itemsArticle.appendChild(kanapDescription);
+        //en commentaire "initialisation des éléments"
 
         kanapLink.setAttribute('href', `./product.html?_id=${result[i]._id}`)
         kanapImg.setAttribute('src', `${result[i].imageUrl}`);
         kanapImg.setAttribute('alt', `${result[i].altTxt}`);
         kanapName.innerHTML = `${result[i].name}`;
         kanapDescription.innerHTML = `${result[i].description}`;
+
+        let itemsContainer = document.querySelector("#items");
+        kanapLink.appendChild(itemsArticle);
+        itemsArticle.appendChild(kanapImg);
+        kanapName.className = 'productName';
+        // kanapName.classList.add('productName'); pour ne pas écraser les autres classes
+        itemsArticle.appendChild(kanapName);
+        kanapDescription.className = 'productDescription';
+        itemsArticle.appendChild(kanapDescription);
+
+        itemsContainer.appendChild(kanapLink);
+
     }
 }
+// faire appendChild une seule fois pour ajouter un article sur la page (appendchild à la fin)
