@@ -2,6 +2,7 @@
 let cart = (localStorage.getItem('panier') !== null) ? JSON.parse(localStorage.getItem('panier')) : [];
 console.log(cart);
 
+
 // on déclare l'élément HTML de la page panier dans lequel insérer les données recueillies
 const kanapHtmlContainer = document.querySelector('#cart__items');
 
@@ -12,19 +13,27 @@ async function getDetails(kanapId) {
     return result;
 }
 
+let totalQuantity = 0;
+let totalPrice = 0;
+let htmlTotalQuantity = document.querySelector('#totalQuantity');
+let htmlTotalPrice = document.querySelector('#totalPrice');
+
+
 function parcourirPanierKanaps(cart) {
     for (let item of cart) {
-        console.log(item.kanapColor);
         getDetails(item.kanapId)
             .then((response) => response.json())
             .then((details) => {
+                console.log(details);
                 showCartKanap(item, details);
             })
             .catch((error) => alert("erreur"));
     }
 }
 
+
 function showCartKanap(produit, details) {
+
     //création article
     let kanapHtmlData = document.createElement('article');
     kanapHtmlData.classList.add('cart__item');
@@ -75,9 +84,8 @@ function showCartKanap(produit, details) {
     kanapCartContentSettingsDeleteItem.classList.add('deleteItem');
     kanapCartContentSettingsDeleteItem.textContent = 'Supprimer';
 
-
-    let kanapQuantity = document.createElement("p");
-    kanapQuantity.innerHTML = `<p>Qté : </p>`;
+    let titleQuantity = document.createElement("p");
+    titleQuantity.innerText = `Qté : `;
 
     let kanapInputQuantity = document.createElement('input');
     kanapInputQuantity.setAttribute('type', 'number');
@@ -90,15 +98,65 @@ function showCartKanap(produit, details) {
     // appendChild pour ajouter les éléments dans le HTML
 
     kanapCartContentSettingsDelete.appendChild(kanapCartContentSettingsDeleteItem);
-    kanapCartContentSettingsQuantity.append(kanapQuantity, kanapInputQuantity);
+    kanapCartContentSettingsQuantity.append(titleQuantity, kanapInputQuantity);
     kanapCartContentSettings.append(kanapCartContentSettingsQuantity, kanapCartContentSettingsDelete);
     kanapCartImg.appendChild(kanapImg);
     kanapCartContentDescription.append(kanapTitle, kanapColor, kanapPrice);
     kanapCartContent.append(kanapCartContentDescription, kanapCartContentSettings);
     kanapHtmlData.append(kanapCartImg, kanapCartContent);
     kanapHtmlContainer.appendChild(kanapHtmlData);
-}
 
+    // nb total des produits
+    totalQuantity += produit.kanapQuantity;
+    htmlTotalQuantity.innerText = totalQuantity;
+
+
+    // prix total 
+    totalPrice += details.price * produit.kanapQuantity;
+    htmlTotalPrice.innerText = totalPrice;
+
+    // on écoute s'il y a un chgmt de quantité et on modifie la quantité totale et le prix total
+    kanapInputQuantity.addEventListener('input', (e) => {
+        let currentQuantity = e.target.value - produit.kanapQuantity;
+        htmlTotalQuantity.innerText = totalQuantity + currentQuantity;
+
+        let currentPrice = e.target.value * details.price;
+
+        htmlTotalPrice.innerText = totalPrice -
+            (details.price * produit.kanapQuantity) +
+            currentPrice;
+
+    }, true)
+
+    // fonction pour supprimer un élément
+    let supprimer = document.querySelectorAll('.deleteItem');
+    supprimer.forEach(element => {
+        element.addEventListener('click', (e) => {
+            alert('Etes vous sûr de vouloir supprimer cet article ? Vous pouvez revenir en arrière');
+            let parentArticle = element.closest('article');
+            let articleId = parentArticle.dataset.id;
+            console.log(articleId);
+            // pour commencer on compare les id
+            /** dans un tableau de kanap, si le kanapId est égal au 
+             * articleId alors on récupère son index dans le 
+             * tableau avec findIndex. sinon rien */
+            cart.forEach(element => {
+                if (articleId === produit.kanapId) {
+                    let indexKanapToRemove = cart.findIndex(articleId);
+                    cart.splice(indexKanapToRemove, 1);
+                }
+            })
+
+        })
+    })
+
+    /** 
+         // on récupère l'ID du produit en question avec dataset et element.closest
+         console.log(articleId);
+         // puis on modifie la ligne avec splice
+     })
+     */
+}
 
 /** Fonctionnement de l'algorithme :
  * cette fonction a besoin de getDetails
@@ -111,7 +169,8 @@ parcourirPanierKanaps(cart);
 
 
 
-//même fonction que sur la page produit pour modifier la quantité et supprimer un élt
 // faire en sorte que l'élt disparaisse lorsqu'on clique de la page html et du local storage
 // element.closest à étudier ainsi que dataSet (fonctionnalités JS incontournables)
 //chercher array.splice (permet de modifier une ligne du tableau)
+
+/** valider données saisies formulaires avec Regex.com */
