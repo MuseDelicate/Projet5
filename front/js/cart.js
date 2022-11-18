@@ -116,41 +116,43 @@ function showCartKanap(produit, details) {
 
     // on écoute s'il y a un chgmt de quantité et on modifie la quantité totale et le prix total
     kanapInputQuantity.addEventListener('input', (e) => {
-        let currentQuantity = e.target.value - produit.kanapQuantity;
-        htmlTotalQuantity.innerText = totalQuantity + currentQuantity;
+            let currentQuantity = e.target.value - produit.kanapQuantity;
+            htmlTotalQuantity.innerText = totalQuantity + currentQuantity;
 
-        let currentPrice = e.target.value * details.price;
+            let currentPrice = e.target.value * details.price;
 
-        htmlTotalPrice.innerText = totalPrice -
-            (details.price * produit.kanapQuantity) +
-            currentPrice;
+            htmlTotalPrice.innerText = totalPrice -
+                (details.price * produit.kanapQuantity) +
+                currentPrice;
 
-    }, true)
-
-    // supprimer un élément
+        }, true)
+        // supprimer un élément
     let supprimer = document.querySelectorAll('.deleteItem');
     let tempCart = JSON.parse(localStorage.getItem('panier'));
     console.log(tempCart);
     supprimer.forEach(element => {
-        element.addEventListener('click', () => {
+        element.addEventListener('click', (e) => {
+            e.preventDefault();
             let parentArticle = element.closest('article');
             let articleId = parentArticle.dataset.id;
             let articleColor = parentArticle.dataset.color;
             console.log(articleId);
+            console.log(produit.kanapId);
             console.log(articleColor);
+            console.log(produit.kanapColor);
 
             if (articleId === produit.kanapId &&
                 articleColor === produit.kanapColor
             ) {
                 newCart = tempCart.filter(
                     (kanap) =>
-                    kanap.kanapId !== articleId &&
+                    kanap.kanapId !== articleId ||
                     kanap.kanapColor !== articleColor
                 );
                 console.log(newCart);
                 localStorage.setItem("panier", JSON.stringify(newCart));
+                console.log(localStorage.setItem("panier", JSON.stringify(newCart)));
             }
-
             //console.log(cart);
             //console.log(localStorage.getItem("panier", JSON.stringify(cart)));
             // ce n'est pas le bon article qui est supprimé !
@@ -164,6 +166,7 @@ function showCartKanap(produit, details) {
 
         })
     })
+
 
     /**  let supprimer = document.querySelectorAll('.deleteItem');
 
@@ -195,6 +198,47 @@ function showCartKanap(produit, details) {
          })
      }) */
 }
+/*
+function deleteKanapFromCart() {
+    let supprimer = document.querySelectorAll('.deleteItem');
+    let tempCart = JSON.parse(localStorage.getItem('panier'));
+    //console.log(tempCart);
+    supprimer.forEach(supp => {
+        element.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            let parentArticle = supp.closest('article');
+            let articleId = parentArticle.dataset.id;
+            let articleColor = parentArticle.dataset.color;
+            console.log(articleId);
+            console.log(articleColor);
+
+            for (let product of tempCart) {
+                if (articleId === product.kanapId &&
+                    articleColor === product.kanapColor
+                ) {
+                    newCart = tempCart.filter(
+                        kanap =>
+                        kanap.kanapId !== articleId &&
+                        kanap.kanapColor !== articleColor
+                    );
+                }
+            }
+            console.log(newCart);
+            localStorage.setItem("panier", JSON.stringify(newCart));
+        })
+    })
+}
+*/
+//deleteKanapFromCart();
+
+// on supprime l'élt du DOM
+//parentArticle.remove();
+//location.reload();
+
+// htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
+// htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
+
 
 
 /** Fonctionnement de l'algorithme :
