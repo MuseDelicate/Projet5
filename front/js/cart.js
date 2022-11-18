@@ -24,7 +24,6 @@ function parcourirPanierKanaps(cart) {
         getDetails(item.kanapId)
             .then((response) => response.json())
             .then((details) => {
-                console.log(details);
                 showCartKanap(item, details);
             })
             .catch((error) => alert("erreur"));
@@ -128,35 +127,75 @@ function showCartKanap(produit, details) {
 
     }, true)
 
-    // fonction pour supprimer un élément
+    // supprimer un élément
     let supprimer = document.querySelectorAll('.deleteItem');
+    let tempCart = JSON.parse(localStorage.getItem('panier'));
+    console.log(tempCart);
     supprimer.forEach(element => {
-        element.addEventListener('click', (e) => {
-            alert('Etes vous sûr de vouloir supprimer cet article ? Vous pouvez revenir en arrière');
+        element.addEventListener('click', () => {
             let parentArticle = element.closest('article');
             let articleId = parentArticle.dataset.id;
+            let articleColor = parentArticle.dataset.color;
             console.log(articleId);
-            // pour commencer on compare les id
-            /** dans un tableau de kanap, si le kanapId est égal au 
-             * articleId alors on récupère son index dans le 
-             * tableau avec findIndex. sinon rien */
-            cart.forEach(element => {
-                if (articleId === produit.kanapId) {
-                    let indexKanapToRemove = cart.findIndex(articleId);
-                    cart.splice(indexKanapToRemove, 1);
-                }
-            })
+            console.log(articleColor);
+
+            if (articleId === produit.kanapId &&
+                articleColor === produit.kanapColor
+            ) {
+                newCart = tempCart.filter(
+                    (kanap) =>
+                    kanap.kanapId !== articleId &&
+                    kanap.kanapColor !== articleColor
+                );
+                console.log(newCart);
+                localStorage.setItem("panier", JSON.stringify(newCart));
+            }
+
+            //console.log(cart);
+            //console.log(localStorage.getItem("panier", JSON.stringify(cart)));
+            // ce n'est pas le bon article qui est supprimé !
+
+            // on supprime l'élt du DOM
+            //parentArticle.remove();
+            //location.reload();
+
+            // htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
+            // htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
 
         })
     })
 
-    /** 
-         // on récupère l'ID du produit en question avec dataset et element.closest
-         console.log(articleId);
-         // puis on modifie la ligne avec splice
-     })
-     */
+    /**  let supprimer = document.querySelectorAll('.deleteItem');
+
+     supprimer.forEach(element => {
+         element.addEventListener('click', () => {
+             let parentArticle = element.closest('article');
+             let articleId = parentArticle.dataset.id;
+             let articleColor = parentArticle.dataset.color;
+             console.log(articleId);
+             console.log(articleColor);
+
+             if (articleId === produit.kanapId &&
+                 articleColor === produit.kanapColor
+             ) {
+                 cart = cart.splice(produit, 1);
+                 localStorage.setItem("panier", JSON.stringify(cart));
+             }
+             console.log(cart);
+             console.log(localStorage.getItem("panier", JSON.stringify(cart)));
+             // ce n'est pas le bon article qui est supprimé !
+
+             // on supprime l'élt du DOM
+             parentArticle.remove();
+             //location.reload();
+
+             // htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
+             // htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
+
+         })
+     }) */
 }
+
 
 /** Fonctionnement de l'algorithme :
  * cette fonction a besoin de getDetails
@@ -166,11 +205,5 @@ function showCartKanap(produit, details) {
  */
 
 parcourirPanierKanaps(cart);
-
-
-
-// faire en sorte que l'élt disparaisse lorsqu'on clique de la page html et du local storage
-// element.closest à étudier ainsi que dataSet (fonctionnalités JS incontournables)
-//chercher array.splice (permet de modifier une ligne du tableau)
 
 /** valider données saisies formulaires avec Regex.com */
