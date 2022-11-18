@@ -129,17 +129,12 @@ function showCartKanap(produit, details) {
         // supprimer un élément
     let supprimer = document.querySelectorAll('.deleteItem');
     let tempCart = JSON.parse(localStorage.getItem('panier'));
-    console.log(tempCart);
     supprimer.forEach(element => {
         element.addEventListener('click', (e) => {
             e.preventDefault();
             let parentArticle = element.closest('article');
             let articleId = parentArticle.dataset.id;
             let articleColor = parentArticle.dataset.color;
-            console.log(articleId);
-            console.log(produit.kanapId);
-            console.log(articleColor);
-            console.log(produit.kanapColor);
 
             if (articleId === produit.kanapId &&
                 articleColor === produit.kanapColor
@@ -153,91 +148,19 @@ function showCartKanap(produit, details) {
                 localStorage.setItem("panier", JSON.stringify(newCart));
                 console.log(localStorage.setItem("panier", JSON.stringify(newCart)));
             }
-            //console.log(cart);
+
             //console.log(localStorage.getItem("panier", JSON.stringify(cart)));
-            // ce n'est pas le bon article qui est supprimé !
 
-            // on supprime l'élt du DOM
-            //parentArticle.remove();
-            //location.reload();
+            // on supprime l'élt du DOM et on recharge la page
+            parentArticle.remove();
+            location.reload();
 
-            // htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
-            // htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
-
+            htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
+            htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
         })
     })
 
-
-    /**  let supprimer = document.querySelectorAll('.deleteItem');
-
-     supprimer.forEach(element => {
-         element.addEventListener('click', () => {
-             let parentArticle = element.closest('article');
-             let articleId = parentArticle.dataset.id;
-             let articleColor = parentArticle.dataset.color;
-             console.log(articleId);
-             console.log(articleColor);
-
-             if (articleId === produit.kanapId &&
-                 articleColor === produit.kanapColor
-             ) {
-                 cart = cart.splice(produit, 1);
-                 localStorage.setItem("panier", JSON.stringify(cart));
-             }
-             console.log(cart);
-             console.log(localStorage.getItem("panier", JSON.stringify(cart)));
-             // ce n'est pas le bon article qui est supprimé !
-
-             // on supprime l'élt du DOM
-             parentArticle.remove();
-             //location.reload();
-
-             // htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
-             // htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
-
-         })
-     }) */
 }
-/*
-function deleteKanapFromCart() {
-    let supprimer = document.querySelectorAll('.deleteItem');
-    let tempCart = JSON.parse(localStorage.getItem('panier'));
-    //console.log(tempCart);
-    supprimer.forEach(supp => {
-        element.addEventListener('click', (e) => {
-            e.stopPropagation();
-
-            let parentArticle = supp.closest('article');
-            let articleId = parentArticle.dataset.id;
-            let articleColor = parentArticle.dataset.color;
-            console.log(articleId);
-            console.log(articleColor);
-
-            for (let product of tempCart) {
-                if (articleId === product.kanapId &&
-                    articleColor === product.kanapColor
-                ) {
-                    newCart = tempCart.filter(
-                        kanap =>
-                        kanap.kanapId !== articleId &&
-                        kanap.kanapColor !== articleColor
-                    );
-                }
-            }
-            console.log(newCart);
-            localStorage.setItem("panier", JSON.stringify(newCart));
-        })
-    })
-}
-*/
-//deleteKanapFromCart();
-
-// on supprime l'élt du DOM
-//parentArticle.remove();
-//location.reload();
-
-// htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
-// htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
 
 
 
