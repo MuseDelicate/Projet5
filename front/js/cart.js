@@ -163,7 +163,6 @@ function showCartKanap(produit, details) {
 }
 
 
-
 /** Fonctionnement de l'algorithme :
  * cette fonction a besoin de getDetails
  * getDetails prend l'id d'un canapé et va récupérer les détails de chaque élt pour lequel on lui donne un id
@@ -174,3 +173,19 @@ function showCartKanap(produit, details) {
 parcourirPanierKanaps(cart);
 
 /** valider données saisies formulaires avec Regex.com */
+
+
+/** ------------------ Récupérer et analyser les données saisies par l'utilisateur dans le formulaire----------------- */
+
+// on récupère les éléments html dans lesquels seront entrées les données
+let clientFirstName = document.getElementById('firstName');
+let clientLastName = document.getElementById('lastName');
+let clientAddress = document.getElementById('address');
+let clientCity = document.getElementById('city');
+let clientEmail = document.getElementById('email');
+
+// crétion des RegExp pour tester les valeurs (avec des const car leurs valeurs ne changeront pas dans le temps)
+const regexpEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i;
+const regexpFirstLastName = /^[a-zéèëçà-\s]{2,38}$/i;
+const regExpAdress = /^[0-9]{0,2}\s+[a-zéèàïêëç\-\s]{2,50}$/;
+const regExpCity = /^[0-9]{1,5}\s+[a-zéèàïêëç\-\s]{2,50}$/i;

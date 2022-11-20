@@ -134,10 +134,12 @@ if (kanapId !== null) {
                 if (isNewProduct) {
                     panier.push(produit);
                     console.log('ajout du produit');
+                    alert('Votre produit est bien ajouté au panier !')
                 }
             } else {
                 panier.push(produit); //on ajoute le tout premier produit dans le panier
                 console.log('ajout du premier produit')
+                alert('Votre produit est bien ajouté au panier !')
             }
 
             localStorage.setItem("panier", JSON.stringify(panier));
