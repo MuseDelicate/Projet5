@@ -129,10 +129,12 @@ function showCartKanap(produit, details) {
         // supprimer un élément
     let supprimer = document.querySelectorAll('.deleteItem');
     let tempCart = JSON.parse(localStorage.getItem('panier'));
+
     supprimer.forEach(element => {
         element.addEventListener('click', (e) => {
             e.preventDefault();
             let parentArticle = element.closest('article');
+
             let articleId = parentArticle.dataset.id;
             let articleColor = parentArticle.dataset.color;
 
@@ -151,9 +153,10 @@ function showCartKanap(produit, details) {
 
             //console.log(localStorage.getItem("panier", JSON.stringify(cart)));
 
-            // on supprime l'élt du DOM et on recharge la page
-            parentArticle.remove();
-            location.reload();
+            // on supprime l'élt du DOM et on recharge la page (peu professionnel)
+            // parentArticle.remove();
+            kanapHtmlContainer.removeChild(parentArticle);
+            // location.reload();
 
             htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
             htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
@@ -177,15 +180,106 @@ parcourirPanierKanaps(cart);
 
 /** ------------------ Récupérer et analyser les données saisies par l'utilisateur dans le formulaire----------------- */
 
+
 // on récupère les éléments html dans lesquels seront entrées les données
-let clientFirstName = document.getElementById('firstName');
-let clientLastName = document.getElementById('lastName');
-let clientAddress = document.getElementById('address');
-let clientCity = document.getElementById('city');
-let clientEmail = document.getElementById('email');
+let firstName = document.getElementById('firstName');
+let lastName = document.getElementById('lastName');
+let address = document.getElementById('address');
+let city = document.getElementById('city');
+let email = document.getElementById('email');
 
 // crétion des RegExp pour tester les valeurs (avec des const car leurs valeurs ne changeront pas dans le temps)
-const regexpEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i;
-const regexpFirstLastName = /^[a-zéèëçà-\s]{2,38}$/i;
-const regExpAdress = /^[0-9]{0,2}\s+[a-zéèàïêëç\-\s]{2,50}$/;
+const regExpFirstLastName = /^[a-zéèëçà-\s]{2,38}$/i;
+const regExpAddress = /^[0-9]{0,3}\s+[a-zéèàïêëç\-\s]{2,50}$/;
 const regExpCity = /^[0-9]{1,5}\s+[a-zéèàïêëç\-\s]{2,50}$/i;
+const regExpEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i;
+
+// on créé une classe client (qui recevra les données déjà valides)
+class Client {
+    constructor(clientFirstName, clientLastName, clientAddress, clientCity, clientEmail) {
+        this.clientFirstName = clientFirstName;
+        this.clientLastName = clientLastName;
+        this.clientAddress = clientAddress;
+        this.clientCity = clientCity;
+        this.clientEmail = clientEmail;
+    }
+}
+// on déclare les variables associées
+let clientFirstName = '';
+let clientLastName = '';
+let clientCity = '';
+let clientAddress = '';
+let clientEmail = '';
+
+// créer une variable 'drapeau' qui passe à true quand le champ est correct sinon incorrect
+let isFormCorrect = false;
+
+// écouter les données entrées dans le formulaire
+firstName.addEventListener('input', (e) => {
+    clientFirstName = e.target.value;
+    let firstNameErrorTxt = document.querySelector('#firstNameErrorMsg')
+    if (!regExpFirstLastName.test(clientFirstName)) {
+        firstNameErrorTxt.innerText = 'Le prénom doit contenir entre 2 et 38 caractères et pas de chiffres';
+        isFormCorrect = false;
+    } else {
+        firstNameErrorTxt.innerText = 'valide';
+        isFormCorrect = true;
+    }
+})
+
+lastName.addEventListener('input', (e) => {
+    clientLastName = e.target.value;
+    let lastNameErrorTxt = document.querySelector('#lastNameErrorMsg')
+    if (!regExpFirstLastName.test(clientLastName)) {
+        lastNameErrorTxt.innerText = 'Le nom doit contenir entre 2 et 38 caractères et pas de chiffres';
+        isFormCorrect = false;
+    } else {
+        lastNameErrorTxt.innerText = 'valide';
+        isFormCorrect = true;
+    }
+})
+
+address.addEventListener('input', (e) => {
+    clientAddress = e.target.value;
+    let addressErrorTxt = document.querySelector('#addressErrorMsg')
+    if (!regExpCity.test(clientAddress)) {
+        addressErrorTxt.innerText = 'Ecrivez une adresse au format suivant : 35 rue du Printemps';
+        isFormCorrect = false;
+    } else {
+        addressErrorTxt.innerText = 'valide';
+        isFormCorrect = true;
+    }
+})
+
+city.addEventListener('input', (e) => {
+    clientCity = e.target.value;
+    let cityErrorTxt = document.querySelector('#cityErrorMsg')
+    if (!regExpCity.test(clientCity)) {
+        cityErrorTxt.innerText = 'Ecrivez votre ville au format suivant : 45000 Orléans';
+        isFormCorrect = false;
+    } else {
+        cityErrorTxt.innerText = 'valide';
+        isFormCorrect = true;
+    }
+})
+
+email.addEventListener('input', (e) => {
+    clientEmail = e.target.value;
+    let emailErrorTxt = document.querySelector('#emailErrorMsg')
+    if (!regExpEmail.test(clientEmail)) {
+        emailErrorTxt.innerText = 'Ecrivez votre email au format suivant : test-mail@kanap.com';
+        isFormCorrect = false;
+    } else {
+        emailErrorTxt.innerText = 'valide';
+        isFormCorrect = true;
+    }
+})
+
+// on instancie la classe
+/*let clientData = new Client(clientFirstName, clientLastName, clientAddress, clientCity, clientEmail);
+isFormCorrect ? console.log(clientData) : '';
+*/
+// quand le formulaire est ok on appelle fetch pour l'envoyer au serveur au format json
+// on convertit l'objet client en json et le tableau produit
+// le numéro de commande sera la réponse du fetch
+// au clic sur "commander" on est renvoyé vers la page confimration
