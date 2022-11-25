@@ -115,18 +115,21 @@ function showCartKanap(produit, details) {
     htmlTotalPrice.innerText = totalPrice;
 
     // on écoute s'il y a un chgmt de quantité et on modifie la quantité totale et le prix total
+    // vérifier devdocs le addeventListener avec true (false par défaut)
+    // attention le changement de quantité n'est pas stocké dans le local storage
     kanapInputQuantity.addEventListener('input', (e) => {
-            let currentQuantity = e.target.value - produit.kanapQuantity;
-            htmlTotalQuantity.innerText = totalQuantity + currentQuantity;
+        let currentQuantity = e.target.value - produit.kanapQuantity;
+        htmlTotalQuantity.innerText = totalQuantity + currentQuantity;
 
-            let currentPrice = e.target.value * details.price;
+        let currentPrice = e.target.value * details.price;
 
-            htmlTotalPrice.innerText = totalPrice -
-                (details.price * produit.kanapQuantity) +
-                currentPrice;
+        htmlTotalPrice.innerText = totalPrice -
+            (details.price * produit.kanapQuantity) +
+            currentPrice;
 
-        }, true)
-        // supprimer un élément
+    }, true)
+
+    // supprimer un élément
     let supprimer = document.querySelectorAll('.deleteItem');
     let tempCart = JSON.parse(localStorage.getItem('panier'));
 
@@ -153,10 +156,11 @@ function showCartKanap(produit, details) {
 
             //console.log(localStorage.getItem("panier", JSON.stringify(cart)));
 
-            // on supprime l'élt du DOM et on recharge la page (peu professionnel)
-            // parentArticle.remove();
-            kanapHtmlContainer.removeChild(parentArticle);
-            // location.reload();
+            // on supprime l'élt du DOM et on recharge la page (peu professionnel, plutôt removeChild)
+            parentArticle.remove();
+            //kanapHtmlContainer.removeChild(parentArticle);
+            alert("Ce produit a bien été supprimé de votre panier");
+            location.reload();
 
             htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
             htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
@@ -181,12 +185,25 @@ parcourirPanierKanaps(cart);
 /** ------------------ Récupérer et analyser les données saisies par l'utilisateur dans le formulaire----------------- */
 
 
-// on récupère les éléments html dans lesquels seront entrées les données
-let firstName = document.getElementById('firstName');
-let lastName = document.getElementById('lastName');
-let address = document.getElementById('address');
-let city = document.getElementById('city');
-let email = document.getElementById('email');
+// on récupère les éléments html dans lesquels seront entrées les données + déclarations variables utiles
+let formFirstName = document.getElementById('firstName');
+let formName = document.getElementById('lastName');
+let formAddress = document.getElementById('address');
+let formCity = document.getElementById('city');
+let formEmail = document.getElementById('email');
+
+let orderButton = document.querySelector('#order');
+
+
+// on déclare un objet client qui sera rempli par les données valides du formulaire
+let contact = {
+    firstName: '',
+    lastName: '',
+    address: '',
+    city: '',
+    email: '',
+}
+
 
 // crétion des RegExp pour tester les valeurs (avec des const car leurs valeurs ne changeront pas dans le temps)
 const regExpFirstLastName = /^[a-zéèëçà-\s]{2,38}$/i;
@@ -194,31 +211,15 @@ const regExpAddress = /^[0-9]{0,3}\s+[a-zéèàïêëç\-\s]{2,50}$/;
 const regExpCity = /^[0-9]{1,5}\s+[a-zéèàïêëç\-\s]{2,50}$/i;
 const regExpEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i;
 
-// on créé une classe client (qui recevra les données déjà valides)
-class Client {
-    constructor(clientFirstName, clientLastName, clientAddress, clientCity, clientEmail) {
-        this.clientFirstName = clientFirstName;
-        this.clientLastName = clientLastName;
-        this.clientAddress = clientAddress;
-        this.clientCity = clientCity;
-        this.clientEmail = clientEmail;
-    }
-}
-// on déclare les variables associées
-let clientFirstName = '';
-let clientLastName = '';
-let clientCity = '';
-let clientAddress = '';
-let clientEmail = '';
 
 // créer une variable 'drapeau' qui passe à true quand le champ est correct sinon incorrect
 let isFormCorrect = false;
 
 // écouter les données entrées dans le formulaire
-firstName.addEventListener('input', (e) => {
-    clientFirstName = e.target.value;
+formFirstName.addEventListener('input', (e) => {
+    contact.firstName = e.target.value;
     let firstNameErrorTxt = document.querySelector('#firstNameErrorMsg')
-    if (!regExpFirstLastName.test(clientFirstName)) {
+    if (!regExpFirstLastName.test(contact.firstName)) {
         firstNameErrorTxt.innerText = 'Le prénom doit contenir entre 2 et 38 caractères et pas de chiffres';
         isFormCorrect = false;
     } else {
@@ -227,10 +228,10 @@ firstName.addEventListener('input', (e) => {
     }
 })
 
-lastName.addEventListener('input', (e) => {
-    clientLastName = e.target.value;
+formName.addEventListener('input', (e) => {
+    contact.lastName = e.target.value;
     let lastNameErrorTxt = document.querySelector('#lastNameErrorMsg')
-    if (!regExpFirstLastName.test(clientLastName)) {
+    if (!regExpFirstLastName.test(contact.lastName)) {
         lastNameErrorTxt.innerText = 'Le nom doit contenir entre 2 et 38 caractères et pas de chiffres';
         isFormCorrect = false;
     } else {
@@ -239,10 +240,10 @@ lastName.addEventListener('input', (e) => {
     }
 })
 
-address.addEventListener('input', (e) => {
-    clientAddress = e.target.value;
+formAddress.addEventListener('input', (e) => {
+    contact.address = e.target.value;
     let addressErrorTxt = document.querySelector('#addressErrorMsg')
-    if (!regExpCity.test(clientAddress)) {
+    if (!regExpCity.test(contact.address)) {
         addressErrorTxt.innerText = 'Ecrivez une adresse au format suivant : 35 rue du Printemps';
         isFormCorrect = false;
     } else {
@@ -251,10 +252,10 @@ address.addEventListener('input', (e) => {
     }
 })
 
-city.addEventListener('input', (e) => {
-    clientCity = e.target.value;
+formCity.addEventListener('input', (e) => {
+    contact.city = e.target.value;
     let cityErrorTxt = document.querySelector('#cityErrorMsg')
-    if (!regExpCity.test(clientCity)) {
+    if (!regExpCity.test(contact.city)) {
         cityErrorTxt.innerText = 'Ecrivez votre ville au format suivant : 45000 Orléans';
         isFormCorrect = false;
     } else {
@@ -263,11 +264,11 @@ city.addEventListener('input', (e) => {
     }
 })
 
-email.addEventListener('input', (e) => {
-    clientEmail = e.target.value;
+formEmail.addEventListener('input', (e) => {
+    contact.email = e.target.value;
     let emailErrorTxt = document.querySelector('#emailErrorMsg')
-    if (!regExpEmail.test(clientEmail)) {
-        emailErrorTxt.innerText = 'Ecrivez votre email au format suivant : test-mail@kanap.com';
+    if (!regExpEmail.test(contact.email)) {
+        emailErrorTxt.innerText = 'Ecrivez votre email au format suivant : test.mail@kanap.com';
         isFormCorrect = false;
     } else {
         emailErrorTxt.innerText = 'valide';
@@ -275,10 +276,53 @@ email.addEventListener('input', (e) => {
     }
 })
 
-// on instancie la classe
-/*let clientData = new Client(clientFirstName, clientLastName, clientAddress, clientCity, clientEmail);
-isFormCorrect ? console.log(clientData) : '';
-*/
+// On récupère tous les produits à nouveau pour s'assurer de tenir compte des modifications du panier :
+let products = [];
+for (let article of cart) {
+    products.push(article.kanapId);
+}
+
+// quand on clique sur le bouton, le contact est généré
+orderButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!isFormCorrect) {
+        alert('Veuillez vérifier votre saisie');
+        return;
+    } else {
+        // je créé un contact sur le local storage qui prend les infos d'un client
+        localStorage.setItem('contact', JSON.stringify(contact));
+
+        // on créé le "bon de commande"
+        let kanapOrder = {
+            contact: contact,
+            products: products,
+        }
+        console.log(kanapOrder);
+        // envoie du kanapOrder au serveur
+
+        fetch('http://localhost:3000/api/products/order', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(kanapOrder),
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    return response.json();
+                }
+            })
+            // puis récupération de l'identifiant de la commande
+            .then((data) => {
+                let orderId = data.orderId;
+                console.log(orderId);
+                //window.location.assign("confirmation.html?id=" + orderId);
+            });
+    }
+});
+
+
+
 // quand le formulaire est ok on appelle fetch pour l'envoyer au serveur au format json
 // on convertit l'objet client en json et le tableau produit
 // le numéro de commande sera la réponse du fetch
