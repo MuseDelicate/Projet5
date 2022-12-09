@@ -1,12 +1,41 @@
 //on initialise la variable cart
 let cart = (localStorage.getItem('panier') !== null) ? JSON.parse(localStorage.getItem('panier')) : [];
 console.log(cart);
+/*
+let cartString = (localStorage.getItem('panier') !== null) ? localStorage.getItem('panier') : [];
+console.log(cartString);
+cartString.sort();
+console.log(cartString);
+*/
+
+// Tri des objets dans le panier avant de les afficher
+
+
+// ATTENTION à retester
+let organizedCart = [];
+
+function organizeKanap(cart) {
+    for (let i = 0; i < cart.length; i++) {
+        organizedCart.push(cart[i].kanapId);
+        for (let j = i + 1; j < cart.length; j++) {
+            if (cart[i].kanapId === cart[j].kanapId) {
+                organizedCart.push(cart[j].kanapId);
+                cart.splice(j, 1);
+                console.log(cart);
+            }
+        }
+    }
+    console.log(organizedCart);
+}
+organizeKanap(cart);
+// ce n'est plus cart mais le panier déjà rangé
+
 
 
 // on déclare l'élément HTML de la page panier dans lequel insérer les données recueillies
 const kanapHtmlContainer = document.querySelector('#cart__items');
 
-// pas de boucle for dans fetch
+
 // on utilise async et await car fetch peut prendre du temps
 async function getDetails(kanapId) {
     result = await fetch(`http://localhost:3000/api/products/${kanapId}`);
@@ -20,11 +49,16 @@ let htmlTotalPrice = document.querySelector('#totalPrice');
 
 
 function parcourirPanierKanaps(cart) {
+    // let compteur = 0;
     for (let item of cart) {
         getDetails(item.kanapId)
             .then((response) => response.json())
             .then((details) => {
                 showCartKanap(item, details);
+                // compteur++;
+                // if (compteur === cart.length) {
+                //initDeleteEvent();
+                // }
             })
             .catch((error) => alert("erreur"));
     }
@@ -106,6 +140,7 @@ function showCartKanap(produit, details) {
     kanapHtmlContainer.appendChild(kanapHtmlData);
 
     // nb total des produits
+    // mettre en dernier après les fonctions supprimer et modifier ? non mais à recalculer
     totalQuantity += produit.kanapQuantity;
     htmlTotalQuantity.innerText = totalQuantity;
 
@@ -130,16 +165,18 @@ function showCartKanap(produit, details) {
     }, true)
 
     // supprimer un élément
+
     let supprimer = document.querySelectorAll('.deleteItem');
     let tempCart = JSON.parse(localStorage.getItem('panier'));
 
     supprimer.forEach(element => {
-        element.addEventListener('click', (e) => {
-            e.preventDefault();
+        element.addEventListener('click', () => {
             let parentArticle = element.closest('article');
 
             let articleId = parentArticle.dataset.id;
             let articleColor = parentArticle.dataset.color;
+            console.log(articleId);
+            console.log(articleColor);
 
             if (articleId === produit.kanapId &&
                 articleColor === produit.kanapColor
@@ -157,17 +194,26 @@ function showCartKanap(produit, details) {
             //console.log(localStorage.getItem("panier", JSON.stringify(cart)));
 
             // on supprime l'élt du DOM et on recharge la page (peu professionnel, plutôt removeChild)
-            parentArticle.remove();
-            //kanapHtmlContainer.removeChild(parentArticle);
+            // parentArticle.style.display = 'none';
+            // parentArticle.remove();
+            kanapHtmlContainer.removeChild(parentArticle);
             alert("Ce produit a bien été supprimé de votre panier");
             location.reload();
 
-            htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
-            htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
-        })
-    })
+            // htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
+            // htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
 
+        })
+
+    })
 }
+// pour regrouper par couleur on créé un nv panier dynamique puis on parcourt l'ancien pour chercher chaque produit et regrouper chaque article avec sort (méthode sort)
+// méthode shift pour récupérer un élément du tableau (shift sort un élément du tableau et on peut encore l'utiliser ensuite pour le comparer aux autres)
+
+
+parcourirPanierKanaps(organizedCart);
+
+
 
 
 /** Fonctionnement de l'algorithme :
@@ -177,7 +223,6 @@ function showCartKanap(produit, details) {
  * showCartKanap insère chaque produit dans la page
  */
 
-parcourirPanierKanaps(cart);
 
 /** valider données saisies formulaires avec Regex.com */
 
@@ -195,15 +240,18 @@ let formEmail = document.getElementById('email');
 let orderButton = document.querySelector('#order');
 
 
-// on déclare un objet client qui sera rempli par les données valides du formulaire
-let contact = {
-    firstName: '',
-    lastName: '',
-    address: '',
-    city: '',
-    email: '',
+// on une classe Contact (avec une classe il y a "l'héritage") qui sera remplie par les données valides du formulaire
+
+class Contact {
+    constructor() {}
+    firstName = '';
+    lastName = '';
+    adress = '';
+    city = '';
+    email = '';
 }
 
+let contact = new Contact();
 
 // crétion des RegExp pour tester les valeurs (avec des const car leurs valeurs ne changeront pas dans le temps)
 const regExpFirstLastName = /^[a-zéèëçà-\s]{2,38}$/i;
@@ -289,6 +337,7 @@ orderButton.addEventListener('click', (e) => {
         alert('Veuillez vérifier votre saisie');
         return;
     } else {
+        console.log(contact);
         // je créé un contact sur le local storage qui prend les infos d'un client
         localStorage.setItem('contact', JSON.stringify(contact));
 
@@ -317,13 +366,11 @@ orderButton.addEventListener('click', (e) => {
                 let orderId = data.orderId;
                 console.log(orderId);
                 //window.location.assign("confirmation.html?id=" + orderId);
+                //localStorage.clear();
             });
     }
 });
 
 
 
-// quand le formulaire est ok on appelle fetch pour l'envoyer au serveur au format json
-// on convertit l'objet client en json et le tableau produit
-// le numéro de commande sera la réponse du fetch
-// au clic sur "commander" on est renvoyé vers la page confimration
+// test d'acceptation : reprendre les spec fonctionnelles

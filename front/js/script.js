@@ -1,8 +1,3 @@
-//let requestInit = new Request();
-//requestInit.headers.append("MimeType", "application/json");
-
-
-
 // Requête de l'API pour récupérer les données
 // savoir expliquer le principe de fetch, avec promise, async, await et callback, et requestInit
 // connaître les différentes syntaxes (avec le mot clé function ou les fléches ou l'absence d'acolade sans utiliser de return). L'acolade signiafie qu'il y a un "bloc" de choses à réaliser)
