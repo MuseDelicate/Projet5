@@ -16,10 +16,10 @@ let organizedCart = [];
 
 function organizeKanap(cart) {
     for (let i = 0; i < cart.length; i++) {
-        organizedCart.push(cart[i].kanapId);
+        organizedCart.push(cart[i]);
         for (let j = i + 1; j < cart.length; j++) {
             if (cart[i].kanapId === cart[j].kanapId) {
-                organizedCart.push(cart[j].kanapId);
+                organizedCart.push(cart[j]);
                 cart.splice(j, 1);
                 console.log(cart);
             }
@@ -28,7 +28,6 @@ function organizeKanap(cart) {
     console.log(organizedCart);
 }
 organizeKanap(cart);
-// ce n'est plus cart mais le panier déjà rangé
 
 
 
@@ -188,7 +187,6 @@ function showCartKanap(produit, details) {
                 );
                 console.log(newCart);
                 localStorage.setItem("panier", JSON.stringify(newCart));
-                console.log(localStorage.setItem("panier", JSON.stringify(newCart)));
             }
 
             //console.log(localStorage.getItem("panier", JSON.stringify(cart)));
