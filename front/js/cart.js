@@ -215,6 +215,7 @@ class Contact {
 }
 
 let contact = new Contact();
+console.log(contact);
 
 
 // crétion des RegExp pour tester les valeurs 
@@ -224,7 +225,12 @@ const regExpAddress = /^[0-9]{0,3}\s+[a-zéèàïêëç\-\s]{2,50}$/;
 const regExpCity = /^[0-9]{1,5}\s+[a-zéèàïêëç\-\s]{2,50}$/i;
 const regExpEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i;
 
-let isFormCorrect = false;
+let isFormCorrectFirstName = false;
+let isFormCorrectLastName = false;
+let isFormCorrectAddress = false;
+let isFormCorrectCity = false;
+let isFormCorrectEmail = false;
+
 
 
 // écouter les données entrées dans le formulaire
@@ -234,10 +240,10 @@ formFirstName.addEventListener('input', (e) => {
     let firstNameErrorTxt = document.querySelector('#firstNameErrorMsg')
     if (!regExpFirstLastName.test(contact.firstName)) {
         firstNameErrorTxt.innerText = 'Le prénom doit contenir entre 2 et 38 caractères et pas de chiffres';
-        isFormCorrect = false;
+        isFormCorrectFirstName = false;
     } else {
         firstNameErrorTxt.innerText = 'valide';
-        isFormCorrect = true;
+        isFormCorrectFirstName = true;
     }
 })
 
@@ -246,10 +252,10 @@ formName.addEventListener('input', (e) => {
     let lastNameErrorTxt = document.querySelector('#lastNameErrorMsg')
     if (!regExpFirstLastName.test(contact.lastName)) {
         lastNameErrorTxt.innerText = 'Le nom doit contenir entre 2 et 38 caractères et pas de chiffres';
-        isFormCorrect = false;
+        isFormCorrectLastName = false;
     } else {
         lastNameErrorTxt.innerText = 'valide';
-        isFormCorrect = true;
+        isFormCorrectLastName = true;
     }
 })
 
@@ -258,10 +264,10 @@ formAddress.addEventListener('input', (e) => {
     let addressErrorTxt = document.querySelector('#addressErrorMsg')
     if (!regExpCity.test(contact.address)) {
         addressErrorTxt.innerText = 'Ecrivez une adresse au format suivant : 35 rue du Printemps';
-        isFormCorrect = false;
+        isFormCorrectAddress = false;
     } else {
         addressErrorTxt.innerText = 'valide';
-        isFormCorrect = true;
+        isFormCorrectAddress = true;
     }
 })
 
@@ -270,10 +276,10 @@ formCity.addEventListener('input', (e) => {
     let cityErrorTxt = document.querySelector('#cityErrorMsg')
     if (!regExpCity.test(contact.city)) {
         cityErrorTxt.innerText = 'Ecrivez votre ville au format suivant : 45000 Orléans';
-        isFormCorrect = false;
+        isFormCorrectCity = false;
     } else {
         cityErrorTxt.innerText = 'valide';
-        isFormCorrect = true;
+        isFormCorrectCity = true;
     }
 })
 
@@ -282,10 +288,10 @@ formEmail.addEventListener('input', (e) => {
     let emailErrorTxt = document.querySelector('#emailErrorMsg')
     if (!regExpEmail.test(contact.email)) {
         emailErrorTxt.innerText = 'Ecrivez votre email au format suivant : test.mail@kanap.com';
-        isFormCorrect = false;
+        isFormCorrectEmail === false;
     } else {
         emailErrorTxt.innerText = 'valide';
-        isFormCorrect = true;
+        isFormCorrectEmail = true;
     }
 })
 
@@ -301,7 +307,7 @@ console.log(products);
 
 orderButton.addEventListener('click', (e) => {
     e.preventDefault();
-    if (!isFormCorrect) {
+    if (!isFormCorrectFirstName || !isFormCorrectLastName || !isFormCorrectAddress || !isFormCorrectCity || !isFormCorrectEmail) {
         alert('Veuillez vérifier votre saisie');
         return;
     } else {
