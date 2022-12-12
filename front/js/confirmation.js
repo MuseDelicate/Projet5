@@ -6,3 +6,4 @@ console.log(orderId);
 let spanOrderId = document.getElementById('orderId');
 
 spanOrderId.innerHTML = orderId;
+localStorage.clear();

@@ -1,17 +1,9 @@
 //on initialise la variable cart
 let cart = (localStorage.getItem('panier') !== null) ? JSON.parse(localStorage.getItem('panier')) : [];
 console.log(cart);
-/*
-let cartString = (localStorage.getItem('panier') !== null) ? localStorage.getItem('panier') : [];
-console.log(cartString);
-cartString.sort();
-console.log(cartString);
-*/
 
 // Tri des objets dans le panier avant de les afficher
 
-
-// ATTENTION à retester
 let organizedCart = [];
 
 function organizeKanap(cart) {
@@ -21,25 +13,20 @@ function organizeKanap(cart) {
             if (cart[i].kanapId === cart[j].kanapId) {
                 organizedCart.push(cart[j]);
                 cart.splice(j, 1);
-                console.log(cart);
             }
         }
     }
     console.log(organizedCart);
+    return organizedCart;
 }
 organizeKanap(cart);
 
 
-
 // on déclare l'élément HTML de la page panier dans lequel insérer les données recueillies
+
 const kanapHtmlContainer = document.querySelector('#cart__items');
 
-
-// on utilise async et await car fetch peut prendre du temps
-async function getDetails(kanapId) {
-    result = await fetch(`http://localhost:3000/api/products/${kanapId}`);
-    return result;
-}
+// Initialisation des variables utilisées
 
 let totalQuantity = 0;
 let totalPrice = 0;
@@ -47,22 +34,28 @@ let htmlTotalQuantity = document.querySelector('#totalQuantity');
 let htmlTotalPrice = document.querySelector('#totalPrice');
 
 
-function parcourirPanierKanaps(cart) {
-    // let compteur = 0;
-    for (let item of cart) {
+// Récupération depuis le serveur des détails de chaque produit (de manière asynchrone car fetch peut prendre du temps)
+
+async function getDetails(kanapId) {
+    result = await fetch(`http://localhost:3000/api/products/${kanapId}`);
+    return result;
+}
+
+// On récupère les détails de chaque élément du panier et on les insère dans la page
+
+function parcourirPanierKanaps(organizedCart) {
+    for (let item of organizedCart) {
         getDetails(item.kanapId)
             .then((response) => response.json())
             .then((details) => {
                 showCartKanap(item, details);
-                // compteur++;
-                // if (compteur === cart.length) {
-                //initDeleteEvent();
-                // }
             })
             .catch((error) => alert("erreur"));
     }
 }
 
+
+// Fonction qui va afficher dans la page chaque produit du panier (récupéré du local storage)
 
 function showCartKanap(produit, details) {
 
@@ -84,8 +77,7 @@ function showCartKanap(produit, details) {
     let kanapCartContent = document.createElement('div');
     kanapCartContent.classList.add('cart__item__content');
 
-    // creation +initialisation des éléments pour la partie description
-
+    // creation et initialisation des éléments pour la partie description
     let kanapCartContentDescription = document.createElement('div');
     kanapCartContentDescription.classList.add('cart__item__content__description');
 
@@ -98,12 +90,11 @@ function showCartKanap(produit, details) {
     let kanapPrice = document.createElement('p');
     kanapPrice.innerHTML = details.price + '€';
 
-    // creation +initialisation des éléments pour la partie description
+    // creation et initialisation des éléments pour la partie description
     let kanapCartContentSettings = document.createElement('div');
     kanapCartContentSettings.classList.add('cart__item__content__settings');
 
     // div quantité
-
     let kanapCartContentSettingsQuantity = document.createElement('div');
     kanapCartContentSettingsQuantity.classList.add('cart__item__content__settings__quantity');
 
@@ -111,7 +102,6 @@ function showCartKanap(produit, details) {
     kanapCartContentSettingsDelete.classList.add('cart__item__content__settings__delete');
 
     // delete
-
     let kanapCartContentSettingsDeleteItem = document.createElement('p');
     kanapCartContentSettingsDeleteItem.classList.add('deleteItem');
     kanapCartContentSettingsDeleteItem.textContent = 'Supprimer';
@@ -128,7 +118,6 @@ function showCartKanap(produit, details) {
     kanapInputQuantity.setAttribute('value', produit.kanapQuantity);
 
     // appendChild pour ajouter les éléments dans le HTML
-
     kanapCartContentSettingsDelete.appendChild(kanapCartContentSettingsDeleteItem);
     kanapCartContentSettingsQuantity.append(titleQuantity, kanapInputQuantity);
     kanapCartContentSettings.append(kanapCartContentSettingsQuantity, kanapCartContentSettingsDelete);
@@ -138,19 +127,17 @@ function showCartKanap(produit, details) {
     kanapHtmlData.append(kanapCartImg, kanapCartContent);
     kanapHtmlContainer.appendChild(kanapHtmlData);
 
-    // nb total des produits
-    // mettre en dernier après les fonctions supprimer et modifier ? non mais à recalculer
+    // Valcul du nombre total des produits
+
     totalQuantity += produit.kanapQuantity;
     htmlTotalQuantity.innerText = totalQuantity;
 
 
-    // prix total 
+    // Calcul du prix total 
     totalPrice += details.price * produit.kanapQuantity;
     htmlTotalPrice.innerText = totalPrice;
 
     // on écoute s'il y a un chgmt de quantité et on modifie la quantité totale et le prix total
-    // vérifier devdocs le addeventListener avec true (false par défaut)
-    // attention le changement de quantité n'est pas stocké dans le local storage
     kanapInputQuantity.addEventListener('input', (e) => {
         let currentQuantity = e.target.value - produit.kanapQuantity;
         htmlTotalQuantity.innerText = totalQuantity + currentQuantity;
@@ -189,40 +176,18 @@ function showCartKanap(produit, details) {
                 localStorage.setItem("panier", JSON.stringify(newCart));
             }
 
-            //console.log(localStorage.getItem("panier", JSON.stringify(cart)));
-
-            // on supprime l'élt du DOM et on recharge la page (peu professionnel, plutôt removeChild)
-            // parentArticle.style.display = 'none';
-            // parentArticle.remove();
             kanapHtmlContainer.removeChild(parentArticle);
-            alert("Ce produit a bien été supprimé de votre panier");
+            window.confirm("Ce produit a bien été supprimé de votre panier");
             location.reload();
-
-            // htmlTotalQuantity.innerText = totalQuantity - produit.kanapQuantity;
-            // htmlTotalPrice.innerText = totalPrice - (produit.kanapQuantity * details.price);
 
         })
 
     })
 }
-// pour regrouper par couleur on créé un nv panier dynamique puis on parcourt l'ancien pour chercher chaque produit et regrouper chaque article avec sort (méthode sort)
-// méthode shift pour récupérer un élément du tableau (shift sort un élément du tableau et on peut encore l'utiliser ensuite pour le comparer aux autres)
 
-
+console.log(organizedCart);
 parcourirPanierKanaps(organizedCart);
 
-
-
-
-/** Fonctionnement de l'algorithme :
- * cette fonction a besoin de getDetails
- * getDetails prend l'id d'un canapé et va récupérer les détails de chaque élt pour lequel on lui donne un id
- * la fonction parcourirPanierKanaps va regarder tous les éléments contenus dans le panier et leur appliquer la fonction showCartKanap
- * showCartKanap insère chaque produit dans la page
- */
-
-
-/** valider données saisies formulaires avec Regex.com */
 
 
 /** ------------------ Récupérer et analyser les données saisies par l'utilisateur dans le formulaire----------------- */
@@ -238,7 +203,7 @@ let formEmail = document.getElementById('email');
 let orderButton = document.querySelector('#order');
 
 
-// on une classe Contact (avec une classe il y a "l'héritage") qui sera remplie par les données valides du formulaire
+// Déclaration d'une classe Contact qui sera remplie par les données valides du formulaire
 
 class Contact {
     constructor() {}
@@ -251,17 +216,19 @@ class Contact {
 
 let contact = new Contact();
 
-// crétion des RegExp pour tester les valeurs (avec des const car leurs valeurs ne changeront pas dans le temps)
+
+// crétion des RegExp pour tester les valeurs 
+
 const regExpFirstLastName = /^[a-zéèëçà-\s]{2,38}$/i;
 const regExpAddress = /^[0-9]{0,3}\s+[a-zéèàïêëç\-\s]{2,50}$/;
 const regExpCity = /^[0-9]{1,5}\s+[a-zéèàïêëç\-\s]{2,50}$/i;
 const regExpEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i;
 
-
-// créer une variable 'drapeau' qui passe à true quand le champ est correct sinon incorrect
 let isFormCorrect = false;
 
+
 // écouter les données entrées dans le formulaire
+
 formFirstName.addEventListener('input', (e) => {
     contact.firstName = e.target.value;
     let firstNameErrorTxt = document.querySelector('#firstNameErrorMsg')
@@ -323,28 +290,31 @@ formEmail.addEventListener('input', (e) => {
 })
 
 // On récupère tous les produits à nouveau pour s'assurer de tenir compte des modifications du panier :
+
 let products = [];
-for (let article of cart) {
+for (let article of organizedCart) {
     products.push(article.kanapId);
 }
 
-// quand on clique sur le bouton, le contact est généré
+console.log(products);
+// au clic du bouton, le contact est généré
+
 orderButton.addEventListener('click', (e) => {
     e.preventDefault();
     if (!isFormCorrect) {
         alert('Veuillez vérifier votre saisie');
         return;
     } else {
+        // Création d'un contact sur le local storage qui prend les infos d'un client
         console.log(contact);
-        // je créé un contact sur le local storage qui prend les infos d'un client
         localStorage.setItem('contact', JSON.stringify(contact));
 
-        // on créé le "bon de commande"
+        // Création du "bon de commande"
         let kanapOrder = {
             contact: contact,
             products: products,
         }
-        console.log(kanapOrder);
+
         // envoie du kanapOrder au serveur
 
         fetch('http://localhost:3000/api/products/order', {
@@ -363,12 +333,7 @@ orderButton.addEventListener('click', (e) => {
             .then((data) => {
                 let orderId = data.orderId;
                 console.log(orderId);
-                //window.location.assign("confirmation.html?id=" + orderId);
-                //localStorage.clear();
+                window.location.assign("confirmation.html?id=" + orderId);
             });
     }
 });
-
-
-
-// test d'acceptation : reprendre les spec fonctionnelles
