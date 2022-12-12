@@ -301,18 +301,18 @@ let products = [];
 for (let article of organizedCart) {
     products.push(article.kanapId);
 }
-
-console.log(products);
 // au clic du bouton, le contact est généré
 
 orderButton.addEventListener('click', (e) => {
     e.preventDefault();
-    if (!isFormCorrectFirstName || !isFormCorrectLastName || !isFormCorrectAddress || !isFormCorrectCity || !isFormCorrectEmail) {
+    if (products.length === 0) {
+        alert('Votre panier est vide');
+        return;
+    } else if (!isFormCorrectFirstName || !isFormCorrectLastName || !isFormCorrectAddress || !isFormCorrectCity || !isFormCorrectEmail) {
         alert('Veuillez vérifier votre saisie');
         return;
     } else {
         // Création d'un contact sur le local storage qui prend les infos d'un client
-        console.log(contact);
         localStorage.setItem('contact', JSON.stringify(contact));
 
         // Création du "bon de commande"
@@ -338,7 +338,6 @@ orderButton.addEventListener('click', (e) => {
             // puis récupération de l'identifiant de la commande
             .then((data) => {
                 let orderId = data.orderId;
-                console.log(orderId);
                 window.location.assign("confirmation.html?id=" + orderId);
             });
     }
