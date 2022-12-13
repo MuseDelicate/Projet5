@@ -118,7 +118,7 @@ function showCartKanap(panier, listDetails) {
                 kanapCartContentSettingsDeleteItem.textContent = 'Supprimer';
 
                 let titleQuantity = document.createElement("p");
-                titleQuantity.innerText = `Qté : `;
+                titleQuantity.innerHTML = `Qté : `;
 
                 let kanapInputQuantity = document.createElement('input');
                 kanapInputQuantity.setAttribute('type', 'number');
@@ -141,21 +141,21 @@ function showCartKanap(panier, listDetails) {
                 // Valcul du nombre total des produits
 
                 totalQuantity += produit.kanapQuantity;
-                htmlTotalQuantity.innerText = totalQuantity;
+                htmlTotalQuantity.innerHTML = totalQuantity;
 
 
                 // Calcul du prix total 
                 totalPrice += details.price * produit.kanapQuantity;
-                htmlTotalPrice.innerText = totalPrice;
+                htmlTotalPrice.innerHTML = totalPrice;
 
                 // on écoute s'il y a un chgmt de quantité et on modifie la quantité totale et le prix total
                 kanapInputQuantity.addEventListener('input', (e) => {
                     let currentQuantity = e.target.value - produit.kanapQuantity;
-                    htmlTotalQuantity.innerText = totalQuantity + currentQuantity;
+                    htmlTotalQuantity.innerHTML = totalQuantity + currentQuantity;
 
                     let currentPrice = e.target.value * details.price;
 
-                    htmlTotalPrice.innerText = totalPrice -
+                    htmlTotalPrice.innerHTML = totalPrice -
                         (details.price * produit.kanapQuantity) +
                         currentPrice;
 
@@ -253,10 +253,10 @@ formFirstName.addEventListener('input', (e) => {
     contact.firstName = e.target.value;
     let firstNameErrorTxt = document.querySelector('#firstNameErrorMsg')
     if (!regExpFirstLastName.test(contact.firstName)) {
-        firstNameErrorTxt.innerText = 'Le prénom doit contenir entre 2 et 38 caractères et pas de chiffres';
+        firstNameErrorTxt.innerHTML = 'Le prénom doit contenir entre 2 et 38 caractères et pas de chiffres';
         isFormCorrectFirstName = false;
     } else {
-        firstNameErrorTxt.innerText = 'valide';
+        firstNameErrorTxt.innerHTML = 'valide';
         isFormCorrectFirstName = true;
     }
 })
@@ -265,10 +265,10 @@ formName.addEventListener('input', (e) => {
     contact.lastName = e.target.value;
     let lastNameErrorTxt = document.querySelector('#lastNameErrorMsg')
     if (!regExpFirstLastName.test(contact.lastName)) {
-        lastNameErrorTxt.innerText = 'Le nom doit contenir entre 2 et 38 caractères et pas de chiffres';
+        lastNameErrorTxt.innerHTML = 'Le nom doit contenir entre 2 et 38 caractères et pas de chiffres';
         isFormCorrectLastName = false;
     } else {
-        lastNameErrorTxt.innerText = 'valide';
+        lastNameErrorTxt.innerHTML = 'valide';
         isFormCorrectLastName = true;
     }
 })
@@ -277,10 +277,10 @@ formAddress.addEventListener('input', (e) => {
     contact.address = e.target.value;
     let addressErrorTxt = document.querySelector('#addressErrorMsg')
     if (!regExpCity.test(contact.address)) {
-        addressErrorTxt.innerText = 'Ecrivez une adresse au format suivant : 35 rue du Printemps';
+        addressErrorTxt.innerHTML = 'Ecrivez une adresse au format suivant : 35 rue du Printemps';
         isFormCorrectAddress = false;
     } else {
-        addressErrorTxt.innerText = 'valide';
+        addressErrorTxt.innerHTML = 'valide';
         isFormCorrectAddress = true;
     }
 })
@@ -289,10 +289,10 @@ formCity.addEventListener('input', (e) => {
     contact.city = e.target.value;
     let cityErrorTxt = document.querySelector('#cityErrorMsg')
     if (!regExpCity.test(contact.city)) {
-        cityErrorTxt.innerText = 'Ecrivez votre ville au format suivant : 45000 Orléans';
+        cityErrorTxt.innerHTML = 'Ecrivez votre ville au format suivant : 45000 Orléans';
         isFormCorrectCity = false;
     } else {
-        cityErrorTxt.innerText = 'valide';
+        cityErrorTxt.innerHTML = 'valide';
         isFormCorrectCity = true;
     }
 })
@@ -301,10 +301,10 @@ formEmail.addEventListener('input', (e) => {
     contact.email = e.target.value;
     let emailErrorTxt = document.querySelector('#emailErrorMsg')
     if (!regExpEmail.test(contact.email)) {
-        emailErrorTxt.innerText = 'Ecrivez votre email au format suivant : test.mail@kanap.com';
+        emailErrorTxt.innerHTML = 'Ecrivez votre email au format suivant : test.mail@kanap.com';
         isFormCorrectEmail === false;
     } else {
-        emailErrorTxt.innerText = 'valide';
+        emailErrorTxt.innerHTML = 'valide';
         isFormCorrectEmail = true;
     }
 })
