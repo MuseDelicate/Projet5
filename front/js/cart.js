@@ -42,13 +42,21 @@ async function getDetails(kanapId) {
 }
 
 // On récupère les détails de chaque élément du panier et on les insère dans la page
+// pour que les produits s'affichent dans le bon ordre, on attend que tous les 
+// détails des produits soient récupérés et on les insère dans un tableau. 
+let listDetails = [];
 
 function parcourirPanierKanaps(organizedCart) {
     for (let item of organizedCart) {
+        console.log(item);
         getDetails(item.kanapId)
             .then((response) => response.json())
             .then((details) => {
-                showCartKanap(item, details);
+                listDetails.push(details);
+                // Quand on a tout récupéré on affiche les produits dans la page
+                if (listDetails.length === organizedCart.length) {
+                    showCartKanap(organizedCart, listDetails);
+                }
             })
             .catch((error) => alert("erreur"));
     }
@@ -57,135 +65,141 @@ function parcourirPanierKanaps(organizedCart) {
 
 // Fonction qui va afficher dans la page chaque produit du panier (récupéré du local storage)
 
-function showCartKanap(produit, details) {
+function showCartKanap(panier, listDetails) {
+    for (produit of panier) {
+        for (details of listDetails) {
+            if (produit.kanapId === details._id) {
 
-    //création article
-    let kanapHtmlData = document.createElement('article');
-    kanapHtmlData.classList.add('cart__item');
-    kanapHtmlData.setAttribute('data-ID', produit.kanapId)
-    kanapHtmlData.setAttribute('data-color', produit.kanapColor);
+                //création article
+                let kanapHtmlData = document.createElement('article');
+                kanapHtmlData.classList.add('cart__item');
+                kanapHtmlData.setAttribute('data-ID', produit.kanapId)
+                kanapHtmlData.setAttribute('data-color', produit.kanapColor);
 
-    //création conteneur image
-    let kanapCartImg = document.createElement('div');
-    kanapCartImg.classList.add('cart__item__img');
+                //création conteneur image
+                let kanapCartImg = document.createElement('div');
+                kanapCartImg.classList.add('cart__item__img');
 
-    //insertion image dans son conteneur
-    let kanapImg = document.createElement('img');
-    kanapImg.setAttribute('src', `${details.imageUrl}`);
-    kanapImg.setAttribute('alt', `${details.altTxt}`);
+                //insertion image dans son conteneur
+                let kanapImg = document.createElement('img');
+                kanapImg.setAttribute('src', `${details.imageUrl}`);
+                kanapImg.setAttribute('alt', `${details.altTxt}`);
 
-    let kanapCartContent = document.createElement('div');
-    kanapCartContent.classList.add('cart__item__content');
+                let kanapCartContent = document.createElement('div');
+                kanapCartContent.classList.add('cart__item__content');
 
-    // creation et initialisation des éléments pour la partie description
-    let kanapCartContentDescription = document.createElement('div');
-    kanapCartContentDescription.classList.add('cart__item__content__description');
+                // creation et initialisation des éléments pour la partie description
+                let kanapCartContentDescription = document.createElement('div');
+                kanapCartContentDescription.classList.add('cart__item__content__description');
 
-    let kanapTitle = document.createElement('h2');
-    kanapTitle.textContent = details.name;
+                let kanapTitle = document.createElement('h2');
+                kanapTitle.textContent = details.name;
 
-    let kanapColor = document.createElement('p');
-    kanapColor.innerHTML = produit.kanapColor;
+                let kanapColor = document.createElement('p');
+                kanapColor.innerHTML = produit.kanapColor;
 
-    let kanapPrice = document.createElement('p');
-    kanapPrice.innerHTML = details.price + '€';
+                let kanapPrice = document.createElement('p');
+                kanapPrice.innerHTML = details.price + '€';
 
-    // creation et initialisation des éléments pour la partie description
-    let kanapCartContentSettings = document.createElement('div');
-    kanapCartContentSettings.classList.add('cart__item__content__settings');
+                // creation et initialisation des éléments pour la partie description
+                let kanapCartContentSettings = document.createElement('div');
+                kanapCartContentSettings.classList.add('cart__item__content__settings');
 
-    // div quantité
-    let kanapCartContentSettingsQuantity = document.createElement('div');
-    kanapCartContentSettingsQuantity.classList.add('cart__item__content__settings__quantity');
+                // div quantité
+                let kanapCartContentSettingsQuantity = document.createElement('div');
+                kanapCartContentSettingsQuantity.classList.add('cart__item__content__settings__quantity');
 
-    let kanapCartContentSettingsDelete = document.createElement('div');
-    kanapCartContentSettingsDelete.classList.add('cart__item__content__settings__delete');
+                let kanapCartContentSettingsDelete = document.createElement('div');
+                kanapCartContentSettingsDelete.classList.add('cart__item__content__settings__delete');
 
-    // delete
-    let kanapCartContentSettingsDeleteItem = document.createElement('p');
-    kanapCartContentSettingsDeleteItem.classList.add('deleteItem');
-    kanapCartContentSettingsDeleteItem.textContent = 'Supprimer';
+                // delete
+                let kanapCartContentSettingsDeleteItem = document.createElement('p');
+                kanapCartContentSettingsDeleteItem.classList.add('deleteItem');
+                kanapCartContentSettingsDeleteItem.textContent = 'Supprimer';
 
-    let titleQuantity = document.createElement("p");
-    titleQuantity.innerText = `Qté : `;
+                let titleQuantity = document.createElement("p");
+                titleQuantity.innerText = `Qté : `;
 
-    let kanapInputQuantity = document.createElement('input');
-    kanapInputQuantity.setAttribute('type', 'number');
-    kanapInputQuantity.setAttribute('class', 'itemQuantity');
-    kanapInputQuantity.setAttribute('name', 'itemQuantity');
-    kanapInputQuantity.setAttribute('min', '1');
-    kanapInputQuantity.setAttribute('max', '100');
-    kanapInputQuantity.setAttribute('value', produit.kanapQuantity);
+                let kanapInputQuantity = document.createElement('input');
+                kanapInputQuantity.setAttribute('type', 'number');
+                kanapInputQuantity.setAttribute('class', 'itemQuantity');
+                kanapInputQuantity.setAttribute('name', 'itemQuantity');
+                kanapInputQuantity.setAttribute('min', '1');
+                kanapInputQuantity.setAttribute('max', '100');
+                kanapInputQuantity.setAttribute('value', produit.kanapQuantity);
 
-    // appendChild pour ajouter les éléments dans le HTML
-    kanapCartContentSettingsDelete.appendChild(kanapCartContentSettingsDeleteItem);
-    kanapCartContentSettingsQuantity.append(titleQuantity, kanapInputQuantity);
-    kanapCartContentSettings.append(kanapCartContentSettingsQuantity, kanapCartContentSettingsDelete);
-    kanapCartImg.appendChild(kanapImg);
-    kanapCartContentDescription.append(kanapTitle, kanapColor, kanapPrice);
-    kanapCartContent.append(kanapCartContentDescription, kanapCartContentSettings);
-    kanapHtmlData.append(kanapCartImg, kanapCartContent);
-    kanapHtmlContainer.appendChild(kanapHtmlData);
+                // appendChild pour ajouter les éléments dans le HTML
+                kanapCartContentSettingsDelete.appendChild(kanapCartContentSettingsDeleteItem);
+                kanapCartContentSettingsQuantity.append(titleQuantity, kanapInputQuantity);
+                kanapCartContentSettings.append(kanapCartContentSettingsQuantity, kanapCartContentSettingsDelete);
+                kanapCartImg.appendChild(kanapImg);
+                kanapCartContentDescription.append(kanapTitle, kanapColor, kanapPrice);
+                kanapCartContent.append(kanapCartContentDescription, kanapCartContentSettings);
+                kanapHtmlData.append(kanapCartImg, kanapCartContent);
+                kanapHtmlContainer.appendChild(kanapHtmlData);
 
-    // Valcul du nombre total des produits
+                // Valcul du nombre total des produits
 
-    totalQuantity += produit.kanapQuantity;
-    htmlTotalQuantity.innerText = totalQuantity;
+                totalQuantity += produit.kanapQuantity;
+                htmlTotalQuantity.innerText = totalQuantity;
 
 
-    // Calcul du prix total 
-    totalPrice += details.price * produit.kanapQuantity;
-    htmlTotalPrice.innerText = totalPrice;
+                // Calcul du prix total 
+                totalPrice += details.price * produit.kanapQuantity;
+                htmlTotalPrice.innerText = totalPrice;
 
-    // on écoute s'il y a un chgmt de quantité et on modifie la quantité totale et le prix total
-    kanapInputQuantity.addEventListener('input', (e) => {
-        let currentQuantity = e.target.value - produit.kanapQuantity;
-        htmlTotalQuantity.innerText = totalQuantity + currentQuantity;
+                // on écoute s'il y a un chgmt de quantité et on modifie la quantité totale et le prix total
+                kanapInputQuantity.addEventListener('input', (e) => {
+                    let currentQuantity = e.target.value - produit.kanapQuantity;
+                    htmlTotalQuantity.innerText = totalQuantity + currentQuantity;
 
-        let currentPrice = e.target.value * details.price;
+                    let currentPrice = e.target.value * details.price;
 
-        htmlTotalPrice.innerText = totalPrice -
-            (details.price * produit.kanapQuantity) +
-            currentPrice;
+                    htmlTotalPrice.innerText = totalPrice -
+                        (details.price * produit.kanapQuantity) +
+                        currentPrice;
 
-    }, true)
+                }, true)
 
-    // supprimer un élément
+                // supprimer un élément
 
-    let supprimer = document.querySelectorAll('.deleteItem');
-    let tempCart = JSON.parse(localStorage.getItem('panier'));
+                let supprimer = document.querySelectorAll('.deleteItem');
+                let tempCart = JSON.parse(localStorage.getItem('panier'));
 
-    supprimer.forEach(element => {
-        element.addEventListener('click', () => {
-            let parentArticle = element.closest('article');
+                supprimer.forEach(element => {
+                    element.addEventListener('click', () => {
+                        let parentArticle = element.closest('article');
 
-            let articleId = parentArticle.dataset.id;
-            let articleColor = parentArticle.dataset.color;
-            console.log(articleId);
-            console.log(articleColor);
+                        let articleId = parentArticle.dataset.id;
+                        let articleColor = parentArticle.dataset.color;
+                        console.log(articleId);
+                        console.log(articleColor);
 
-            if (articleId === produit.kanapId &&
-                articleColor === produit.kanapColor
-            ) {
-                newCart = tempCart.filter(
-                    (kanap) =>
-                    kanap.kanapId !== articleId ||
-                    kanap.kanapColor !== articleColor
-                );
-                console.log(newCart);
-                localStorage.setItem("panier", JSON.stringify(newCart));
+                        if (articleId === produit.kanapId &&
+                            articleColor === produit.kanapColor
+                        ) {
+                            newCart = tempCart.filter(
+                                (kanap) =>
+                                kanap.kanapId !== articleId ||
+                                kanap.kanapColor !== articleColor
+                            );
+                            console.log(newCart);
+                            localStorage.setItem("panier", JSON.stringify(newCart));
+                        }
+
+                        kanapHtmlContainer.removeChild(parentArticle);
+                        window.confirm("Ce produit a bien été supprimé de votre panier");
+                        location.reload();
+
+                    })
+
+                })
+                break;
             }
-
-            kanapHtmlContainer.removeChild(parentArticle);
-            window.confirm("Ce produit a bien été supprimé de votre panier");
-            location.reload();
-
-        })
-
-    })
+        }
+    }
 }
 
-console.log(organizedCart);
 parcourirPanierKanaps(organizedCart);
 
 
