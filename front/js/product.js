@@ -68,12 +68,10 @@ function kanapDetails(result) {
 
 kanapColors.addEventListener("change", function(e) {
     colorChosen = e.target.value;
-    console.log(colorChosen);
 });
 
 kanapQuantity.addEventListener("input", function(e) {
     quantityChosen = e.target.value;
-    console.log(quantityChosen);
 });
 
 
