@@ -1,6 +1,5 @@
 //on initialise la variable cart
 let cart = (localStorage.getItem('panier') !== null) ? JSON.parse(localStorage.getItem('panier')) : [];
-console.log(cart);
 
 // Tri des objets dans le panier avant de les afficher
 
@@ -16,7 +15,6 @@ function organizeKanap(cart) {
             }
         }
     }
-    console.log(organizedCart);
 
     return organizedCart;
 }
@@ -100,10 +98,10 @@ function showCartKanap(panier, listDetails) {
                 kanapTitle.textContent = details.name;
 
                 let kanapColor = document.createElement('p');
-                kanapColor.innerHTML = produit.kanapColor;
+                kanapColor.textContent = produit.kanapColor;
 
                 let kanapPrice = document.createElement('p');
-                kanapPrice.innerHTML = details.price + '€';
+                kanapPrice.textContent = details.price + '€';
 
                 // creation et initialisation des éléments pour la partie description
                 let kanapCartContentSettings = document.createElement('div');
@@ -122,7 +120,7 @@ function showCartKanap(panier, listDetails) {
                 kanapCartContentSettingsDeleteItem.textContent = 'Supprimer';
 
                 let titleQuantity = document.createElement("p");
-                titleQuantity.innerHTML = `Qté : `;
+                titleQuantity.textContent = `Qté : `;
 
                 let kanapInputQuantity = document.createElement('input');
                 kanapInputQuantity.setAttribute('type', 'number');
@@ -143,13 +141,12 @@ function showCartKanap(panier, listDetails) {
                 kanapHtmlContainer.appendChild(kanapHtmlData);
 
 
-                modifyQuantity(produit /*, details*/ );
+                modifyQuantity(produit);
                 deleteKanap(produit);
 
-                // sumPriceQuantity(produit, details);
+                sumPriceQuantity(produit, details);
                 break;
             }
-
         }
     }
 }
@@ -157,7 +154,7 @@ function showCartKanap(panier, listDetails) {
 
 parcourirPanierKanaps(organizedCart);
 
-function deleteKanap(produit) {
+function deleteKanap(produit, details) {
 
     // supprimer un élément
 
@@ -183,21 +180,32 @@ function deleteKanap(produit) {
             }
 
             kanapHtmlContainer.removeChild(parentArticle);
-            window.confirm("Ce produit a bien été supprimé de votre panier");
-            location.reload();
+            // Recalcul du nombre total des produits
+            totalQuantity -= Number(produit.kanapQuantity);
+            htmlTotalQuantity.textContent = totalQuantity;
+
+            // Recalcul du prix total 
+            totalPrice -= details.price * produit.kanapQuantity;
+            htmlTotalPrice.textContent = totalPrice;
+
+            //window.alert('Ce produit a bien été supprimé de votre panier !');
 
         })
-
     })
-
 }
 
-function modifyQuantity(produit /*, details*/ ) {
+function modifyQuantity(produit) {
+
+    // modifier la quantité d'un produit 
+
     let quantityInput = document.querySelectorAll('.itemQuantity');
     let tempCart = JSON.parse(localStorage.getItem('panier'));
-
     quantityInput.forEach(element => {
-            element.addEventListener('change', (e) => {
+        element.addEventListener('change', (e) => {
+            if (e.target.value > 0 && e.target.value < 101) {
+                let oldQuantity = produit.kanapQuantity;
+                console.log(oldQuantity);
+                console.log(e.target.value);
 
                 let parentArticle = element.closest('article');
 
@@ -219,26 +227,36 @@ function modifyQuantity(produit /*, details*/ ) {
 
                     localStorage.setItem("panier", JSON.stringify(newCart));
                 }
-                window.confirm("La quantité de ce produit a bien été modifiée");
-                location.reload();
 
-            })
+                // Recalcul du nombre total des produits
+                console.log(totalQuantity);
+                totalQuantity = Number(totalQuantity) + Number(e.target.value) - Number(oldQuantity);
+                console.log(totalQuantity);
+                htmlTotalQuantity.textContent = Number(totalQuantity);
 
+                // Recalcul du prix total 
+                totalPrice = totalPrice + (e.target.value * details.price) - (oldQuantity * details.price);
+                htmlTotalPrice.textContent = totalPrice;
+
+                window.alert('La quantité de ce produit a bien été modifiée !');
+            } else {
+                window.alert('Veuillez choisir une quantité entre 1 et 100');
+
+                return;
+            }
         })
-        //sumPriceQuantity(produit, details);
-
+    })
 }
 
 
 function sumPriceQuantity(produit, details) {
     // Calcul du nombre total des produits
-
-    totalQuantity += produit.kanapQuantity;
-    htmlTotalQuantity.innerHTML = totalQuantity;
+    totalQuantity += Number(produit.kanapQuantity);
+    htmlTotalQuantity.textContent = totalQuantity;
 
     // Calcul du prix total 
     totalPrice += details.price * produit.kanapQuantity;
-    htmlTotalPrice.innerHTML = totalPrice;
+    htmlTotalPrice.textContent = totalPrice;
 }
 
 
@@ -291,10 +309,10 @@ formFirstName.addEventListener('input', (e) => {
     contact.firstName = e.target.value;
     let firstNameErrorTxt = document.querySelector('#firstNameErrorMsg')
     if (!regExpFirstLastName.test(contact.firstName)) {
-        firstNameErrorTxt.innerHTML = 'Le prénom doit contenir entre 2 et 38 caractères et pas de chiffres';
+        firstNameErrorTxt.textContent = 'Le prénom doit contenir entre 2 et 38 caractères et pas de chiffres';
         isFormCorrectFirstName = false;
     } else {
-        firstNameErrorTxt.innerHTML = 'valide';
+        firstNameErrorTxt.textContent = 'valide';
         isFormCorrectFirstName = true;
     }
 })
@@ -303,10 +321,10 @@ formName.addEventListener('input', (e) => {
     contact.lastName = e.target.value;
     let lastNameErrorTxt = document.querySelector('#lastNameErrorMsg')
     if (!regExpFirstLastName.test(contact.lastName)) {
-        lastNameErrorTxt.innerHTML = 'Le nom doit contenir entre 2 et 38 caractères et pas de chiffres';
+        lastNameErrorTxt.textContent = 'Le nom doit contenir entre 2 et 38 caractères et pas de chiffres';
         isFormCorrectLastName = false;
     } else {
-        lastNameErrorTxt.innerHTML = 'valide';
+        lastNameErrorTxt.textContent = 'valide';
         isFormCorrectLastName = true;
     }
 })
@@ -315,10 +333,10 @@ formAddress.addEventListener('input', (e) => {
     contact.address = e.target.value;
     let addressErrorTxt = document.querySelector('#addressErrorMsg')
     if (!regExpCity.test(contact.address)) {
-        addressErrorTxt.innerHTML = 'Ecrivez une adresse au format suivant : 35 rue du Printemps';
+        addressErrorTxt.textContent = 'Ecrivez une adresse au format suivant : 35 rue du Printemps';
         isFormCorrectAddress = false;
     } else {
-        addressErrorTxt.innerHTML = 'valide';
+        addressErrorTxt.textContent = 'valide';
         isFormCorrectAddress = true;
     }
 })
@@ -327,10 +345,10 @@ formCity.addEventListener('input', (e) => {
     contact.city = e.target.value;
     let cityErrorTxt = document.querySelector('#cityErrorMsg')
     if (!regExpCity.test(contact.city)) {
-        cityErrorTxt.innerHTML = 'Ecrivez votre ville au format suivant : 45000 Orléans';
+        cityErrorTxt.textContent = 'Ecrivez votre ville au format suivant : 45000 Orléans';
         isFormCorrectCity = false;
     } else {
-        cityErrorTxt.innerHTML = 'valide';
+        cityErrorTxt.textContent = 'valide';
         isFormCorrectCity = true;
     }
 })
@@ -339,10 +357,10 @@ formEmail.addEventListener('input', (e) => {
     contact.email = e.target.value;
     let emailErrorTxt = document.querySelector('#emailErrorMsg')
     if (!regExpEmail.test(contact.email)) {
-        emailErrorTxt.innerHTML = 'Ecrivez votre email au format suivant : test.mail@kanap.com';
+        emailErrorTxt.textContent = 'Ecrivez votre email au format suivant : test.mail@kanap.com';
         isFormCorrectEmail === false;
     } else {
-        emailErrorTxt.innerHTML = 'valide';
+        emailErrorTxt.textContent = 'valide';
         isFormCorrectEmail = true;
     }
 })

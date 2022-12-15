@@ -28,8 +28,8 @@ function showKanaps(result) {
         kanapLink.setAttribute('href', `./product.html?_id=${result[i]._id}`)
         kanapImg.setAttribute('src', `${result[i].imageUrl}`);
         kanapImg.setAttribute('alt', `${result[i].altTxt}`);
-        kanapName.innerHTML = `${result[i].name}`;
-        kanapDescription.innerHTML = `${result[i].description}`;
+        kanapName.textContent = `${result[i].name}`;
+        kanapDescription.textContent = `${result[i].description}`;
 
         // On indique au navigateur comment vont s'imbriquer les éléments entre eux
         let itemsContainer = document.querySelector("#items");

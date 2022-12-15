@@ -3,5 +3,5 @@ const orderId = searchParams.get("id");
 
 let spanOrderId = document.getElementById('orderId');
 
-spanOrderId.innerHTML = orderId;
+spanOrderId.textContent = orderId;
 localStorage.clear();

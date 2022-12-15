@@ -52,9 +52,9 @@ function kanapDetails(result) {
     let kanapImg = document.createElement('img');
     kanapImg.setAttribute('src', `${result.imageUrl}`);
     kanapImg.setAttribute('alt', `${result.altTxt}`);
-    kanapName.innerHTML = `${result.name}`;
-    kanapPrice.innerHTML = `${result.price}`;
-    kanapDescription.innerHTML = `${result.description}`;
+    kanapName.textContent = `${result.name}`;
+    kanapPrice.textContent = `${result.price}`;
+    kanapDescription.textContent = `${result.description}`;
 
     // on récupère les choix de couleur existant pour ce produit
     for (let i = 0; i < result.colors.length; i++) {
