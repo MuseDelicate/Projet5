@@ -143,7 +143,7 @@ function showCartKanap(panier, listDetails) {
 
                 sumPriceQuantity(produit, details);
                 modifyQuantity(produit);
-                deleteKanap(produit, details);
+                // deleteKanap(produit, details);
 
                 break;
             }
@@ -151,13 +151,15 @@ function showCartKanap(panier, listDetails) {
         }
 
     }
+    deleteKanap();
+
 }
 
 
 parcourirPanierKanaps(organizedCart);
 
 
-
+/*
 function deleteKanap(produit, details) {
 
     // supprimer un élément
@@ -203,6 +205,46 @@ function deleteKanap(produit, details) {
     })
 
 }
+*/
+function deleteKanap() {
+
+    // supprimer un élément
+
+    let supprimer = document.querySelectorAll('.deleteItem');
+
+    for (let i = 0; i < supprimer.length; i++) {
+        supprimer[i].addEventListener('click', () => {
+            let parentArticle = supprimer[i].closest('article');
+            kanapHtmlContainer.appendChild(parentArticle);
+
+            let articleId = parentArticle.dataset.id;
+            let articleColor = parentArticle.dataset.color;
+
+            for (let j = 0; j < organizedCart.length; j++) {
+                if (articleId === organizedCart[j].kanapId &&
+                    articleColor === organizedCart[j].kanapColor
+                ) {
+                    newCart = organizedCart.filter(
+                        (kanap) =>
+                        kanap.kanapId !== articleId ||
+                        kanap.kanapColor !== articleColor
+                    );
+                    localStorage.setItem("panier", JSON.stringify(newCart));
+                }
+
+                kanapHtmlContainer.removeChild(parentArticle);
+
+                window.alert('Ce produit a bien été supprimé de votre panier !');
+                location.reload();
+
+            }
+
+        })
+
+    }
+
+}
+
 
 
 
