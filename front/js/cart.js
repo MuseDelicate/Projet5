@@ -1,5 +1,6 @@
 //on initialise la variable cart
 let cart = (localStorage.getItem('panier') !== null) ? JSON.parse(localStorage.getItem('panier')) : [];
+console.log(cart.length);
 
 // Tri des objets dans le panier avant de les afficher
 
@@ -66,7 +67,6 @@ function parcourirPanierKanaps(organizedCart) {
 
 // Fonction qui va afficher dans la page chaque produit du panier (récupéré du local storage)
 
-// function showCartKanap(produit, details) {
 function showCartKanap(panier, listDetails) {
     for (produit of panier) {
         for (details of listDetails) {
@@ -141,18 +141,22 @@ function showCartKanap(panier, listDetails) {
                 kanapHtmlContainer.appendChild(kanapHtmlData);
 
 
-                modifyQuantity(produit);
-                deleteKanap(produit);
-
                 sumPriceQuantity(produit, details);
+                modifyQuantity(produit);
+                deleteKanap(produit, details);
+
                 break;
             }
+
         }
+
     }
 }
 
 
 parcourirPanierKanaps(organizedCart);
+
+
 
 function deleteKanap(produit, details) {
 
@@ -164,6 +168,7 @@ function deleteKanap(produit, details) {
     supprimer.forEach(element => {
         element.addEventListener('click', () => {
             let parentArticle = element.closest('article');
+            kanapHtmlContainer.appendChild(parentArticle);
 
             let articleId = parentArticle.dataset.id;
             let articleColor = parentArticle.dataset.color;
@@ -180,19 +185,27 @@ function deleteKanap(produit, details) {
             }
 
             kanapHtmlContainer.removeChild(parentArticle);
+
             // Recalcul du nombre total des produits
             totalQuantity -= Number(produit.kanapQuantity);
             htmlTotalQuantity.textContent = totalQuantity;
 
             // Recalcul du prix total 
-            totalPrice -= details.price * produit.kanapQuantity;
-            htmlTotalPrice.textContent = totalPrice;
+            totalPrice -= Number(details.price) * Number(produit.kanapQuantity);
+            htmlTotalPrice.textContent = Number(totalPrice);
 
-            //window.alert('Ce produit a bien été supprimé de votre panier !');
+
+            window.alert('Ce produit a bien été supprimé de votre panier !');
+            location.reload();
 
         })
+
     })
+
 }
+
+
+
 
 function modifyQuantity(produit) {
 
@@ -200,10 +213,14 @@ function modifyQuantity(produit) {
 
     let quantityInput = document.querySelectorAll('.itemQuantity');
     let tempCart = JSON.parse(localStorage.getItem('panier'));
+
+    console.log(quantityInput);
+
     quantityInput.forEach(element => {
         element.addEventListener('change', (e) => {
             if (e.target.value > 0 && e.target.value < 101) {
                 let oldQuantity = produit.kanapQuantity;
+
                 console.log(oldQuantity);
                 console.log(e.target.value);
 
@@ -229,16 +246,16 @@ function modifyQuantity(produit) {
                 }
 
                 // Recalcul du nombre total des produits
-                console.log(totalQuantity);
                 totalQuantity = Number(totalQuantity) + Number(e.target.value) - Number(oldQuantity);
-                console.log(totalQuantity);
                 htmlTotalQuantity.textContent = Number(totalQuantity);
 
                 // Recalcul du prix total 
                 totalPrice = totalPrice + (e.target.value * details.price) - (oldQuantity * details.price);
                 htmlTotalPrice.textContent = totalPrice;
 
+
                 window.alert('La quantité de ce produit a bien été modifiée !');
+                location.reload();
             } else {
                 window.alert('Veuillez choisir une quantité entre 1 et 100');
 
@@ -247,7 +264,6 @@ function modifyQuantity(produit) {
         })
     })
 }
-
 
 function sumPriceQuantity(produit, details) {
     // Calcul du nombre total des produits
@@ -258,6 +274,7 @@ function sumPriceQuantity(produit, details) {
     totalPrice += details.price * produit.kanapQuantity;
     htmlTotalPrice.textContent = totalPrice;
 }
+
 
 
 
