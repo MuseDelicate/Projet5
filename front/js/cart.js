@@ -1,6 +1,9 @@
+/** Vérifier lors de l'ajout de plusieurs produits de même couleur que la quantité corresponde bien au nombre de produit 
+ * présents dans le panier (doit rester un nombre, et pas une chaîne de caractère). Bug repéré par l'évaluateur lors de
+ *  la soutenance */
+
 //on initialise la variable cart
 let cart = (localStorage.getItem('panier') !== null) ? JSON.parse(localStorage.getItem('panier')) : [];
-console.log(cart.length);
 
 // Tri des objets dans le panier avant de les afficher
 
@@ -52,7 +55,6 @@ function parcourirPanierKanaps(organizedCart) {
         getDetails(item.kanapId)
             .then((response) => response.json())
             .then((details) => {
-                // showCartKanap(item, details);
                 listDetails.push(details);
                 // Quand on a tout récupéré on affiche les produits dans la page
                 if (listDetails.length === organizedCart.length) {
@@ -142,8 +144,6 @@ function showCartKanap(panier, listDetails) {
 
 
                 sumPriceQuantity(produit, details);
-                modifyQuantity(produit);
-                // deleteKanap(produit, details);
 
                 break;
             }
@@ -152,6 +152,7 @@ function showCartKanap(panier, listDetails) {
 
     }
     deleteKanap();
+    modifyQuantity();
 
 }
 
@@ -159,53 +160,6 @@ function showCartKanap(panier, listDetails) {
 parcourirPanierKanaps(organizedCart);
 
 
-/*
-function deleteKanap(produit, details) {
-
-    // supprimer un élément
-
-    let supprimer = document.querySelectorAll('.deleteItem');
-    let tempCart = JSON.parse(localStorage.getItem('panier'));
-
-    supprimer.forEach(element => {
-        element.addEventListener('click', () => {
-            let parentArticle = element.closest('article');
-            kanapHtmlContainer.appendChild(parentArticle);
-
-            let articleId = parentArticle.dataset.id;
-            let articleColor = parentArticle.dataset.color;
-
-            if (articleId === produit.kanapId &&
-                articleColor === produit.kanapColor
-            ) {
-                newCart = tempCart.filter(
-                    (kanap) =>
-                    kanap.kanapId !== articleId ||
-                    kanap.kanapColor !== articleColor
-                );
-                localStorage.setItem("panier", JSON.stringify(newCart));
-            }
-
-            kanapHtmlContainer.removeChild(parentArticle);
-
-            // Recalcul du nombre total des produits
-            totalQuantity -= Number(produit.kanapQuantity);
-            htmlTotalQuantity.textContent = totalQuantity;
-
-            // Recalcul du prix total 
-            totalPrice -= Number(details.price) * Number(produit.kanapQuantity);
-            htmlTotalPrice.textContent = Number(totalPrice);
-
-
-            window.alert('Ce produit a bien été supprimé de votre panier !');
-            location.reload();
-
-        })
-
-    })
-
-}
-*/
 function deleteKanap() {
 
     // supprimer un élément
@@ -230,12 +184,13 @@ function deleteKanap() {
                         kanap.kanapColor !== articleColor
                     );
                     localStorage.setItem("panier", JSON.stringify(newCart));
+                    kanapHtmlContainer.removeChild(parentArticle);
+
+                    window.alert('Ce produit a bien été supprimé de votre panier !');
+                    location.reload();
+
                 }
 
-                kanapHtmlContainer.removeChild(parentArticle);
-
-                window.alert('Ce produit a bien été supprimé de votre panier !');
-                location.reload();
 
             }
 
@@ -246,66 +201,51 @@ function deleteKanap() {
 }
 
 
-
-
-
-function modifyQuantity(produit) {
+function modifyQuantity() {
 
     // modifier la quantité d'un produit 
 
     let quantityInput = document.querySelectorAll('.itemQuantity');
-    let tempCart = JSON.parse(localStorage.getItem('panier'));
 
-    console.log(quantityInput);
+    for (let i = 0; i < quantityInput.length; i++) {
+        quantityInput[i].addEventListener('change', (e) => {
+            e.preventDefault(e);
 
-    quantityInput.forEach(element => {
-        element.addEventListener('change', (e) => {
             if (e.target.value > 0 && e.target.value < 101) {
-                let oldQuantity = produit.kanapQuantity;
-
-                console.log(oldQuantity);
-                console.log(e.target.value);
-
-                let parentArticle = element.closest('article');
+                let parentArticle = quantityInput[i].closest('article');
 
                 let articleId = parentArticle.dataset.id;
                 let articleColor = parentArticle.dataset.color;
 
-                if (articleId === produit.kanapId &&
-                    articleColor === produit.kanapColor
-                ) {
-                    newCart = tempCart.filter(
-                        (kanap) =>
-                        kanap.kanapId !== articleId ||
-                        kanap.kanapColor !== articleColor
-                    );
-                    produit.kanapId = articleId;
-                    produit.kanapColor = articleColor;
-                    produit.kanapQuantity = e.target.value;
-                    newCart.push(produit);
+                for (let j = 0; j < organizedCart.length; j++) {
+                    if (articleId === organizedCart[j].kanapId &&
+                        articleColor === organizedCart[j].kanapColor
+                    ) {
+                        newCart = organizedCart.filter(
+                            (kanap) =>
+                            kanap.kanapId !== articleId ||
+                            kanap.kanapColor !== articleColor
+                        );
+                        organizedCart[j].kanapId = articleId;
+                        organizedCart[j].kanapColor = articleColor;
+                        organizedCart[j].kanapQuantity = e.target.value;
+                        newCart.push(organizedCart[j]);
 
-                    localStorage.setItem("panier", JSON.stringify(newCart));
+                        localStorage.setItem("panier", JSON.stringify(newCart));
+                        window.alert('La quantité de ce produit a bien été modifiée !');
+                        location.reload();
+
+                    }
                 }
-
-                // Recalcul du nombre total des produits
-                totalQuantity = Number(totalQuantity) + Number(e.target.value) - Number(oldQuantity);
-                htmlTotalQuantity.textContent = Number(totalQuantity);
-
-                // Recalcul du prix total 
-                totalPrice = totalPrice + (e.target.value * details.price) - (oldQuantity * details.price);
-                htmlTotalPrice.textContent = totalPrice;
-
-
-                window.alert('La quantité de ce produit a bien été modifiée !');
-                location.reload();
             } else {
                 window.alert('Veuillez choisir une quantité entre 1 et 100');
-
-                return;
             }
         })
-    })
+
+    }
 }
+
+
 
 function sumPriceQuantity(produit, details) {
     // Calcul du nombre total des produits

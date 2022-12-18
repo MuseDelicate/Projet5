@@ -113,12 +113,11 @@ function addToCart() {
             }
             if (isNewProduct) {
                 panier.push(produit);
-                window.confirm('Votre produit est bien ajouté au panier !')
             }
         } else {
             panier.push(produit);
-            window.confirm('Votre produit est bien ajouté au panier !')
         }
+        window.confirm('Votre produit est bien ajouté au panier !')
 
         localStorage.setItem("panier", JSON.stringify(panier));
 
